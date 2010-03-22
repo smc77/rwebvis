@@ -5,6 +5,21 @@
 
 
 
+data=data.frame(x=c(1, 1.2, 1.7, 1.5, .7, .5, .2), y=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+wv <- new.webvis()
+wv <- new.panel(wv, width=1000)
+#wv <- add.bar(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv <- add.line(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv <- add.dot(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv <- add.wedge(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv <- add.wedge(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), inner.radius=80)
+#wv <- add.line(wv, data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2)))
+wv <- add.line(wv, data=data)
+#wv <- add.bar(wv, data=data)
+#wv <- add.area(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv2 <- add.dot(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+render.webvis(wv)
+
 
 wv <- new.webvis()
 wv <- new.panel(wv, width=800, height=445, right=60, bottom=20)

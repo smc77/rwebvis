@@ -49,45 +49,40 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div>", getTail())
 }
 
-add.line <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, stroke.style) {
-	multiplier <- (wv$height / max(data)) - 5
-	interval <- ((wv$width-30) / length(data))
-	vis <- paste("vis.add(pv.Line)",
-			if(!missing(data) || length(data)) paste(".data(", protovis.data(data), ")") else "",
-			if(!missing(bottom) || length(bottom)) paste(".bottom(function(d) d * ", multiplier, ")"),
-			if(!missing(left) || length(left)) paste(".left(function() this.index * ", interval, " + 15)"),
-			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
-}
-
-add.line <- function(wv, data, bottom, top, left, right, stroke.style, equal.spacing=TRUE) {
+add.line <- function(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
 	if(!("x" %in% colnames(data)))
 		data$x <- 1:length(data$y)
 	vis <- paste("vis.add(pv.Line)",
 			if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
 			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)) - 5), ")"),
+			if(!missing(line.width)) paste(".lineWidth(", line.width, ")") else "",
+			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
+			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
+			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
 			";", sep="")
 	wv$vis <- c(wv$vis, vis)
 	wv
 }
 
-add.bar <- function(wv, data, bottom=(wv$height/2), top, height, width, left=(wv$width/2), right, stroke.style) {
-	multiplier <- (wv$height / max(data)) - 5
-	interval <- ((wv$width-30) / length(data))
+add.bar <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
+	if(!("x" %in% colnames(data)))
+		data$x <- 1:length(data$y)
 	vis <- paste("vis.add(pv.Bar)",
 			if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
-			if(!missing(bottom) || length(bottom)) paste(".bottom(0)"),
-			if(!missing(left) || length(left)) paste(".left(function() this.index * ", interval, ")"),
-			if(!missing(height)) paste(".bottom(", height, ")") else paste(".height(function(d) d * ", multiplier, ")"),
-			if(!missing(width)) paste(".bottom(", width, ")") else paste(".width(", interval - 5, ")"),
+			if(!missing(bottom)) paste(".bottom(", bottom, ")") else if(!("bottom" %in% colnames(data))) paste(".bottom(function(d) d.bottom", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")") else paste(".bottom(0)"),
+			if(!missing(height)) paste(".height(", height, ")") else paste(".height(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
+			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)) - 5), ")"),
+			if(!missing(width)) paste(".width(", 1:nrow(data)-5, ")") else "",
+			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
+			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
+			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
 			";", sep="")
 	wv$vis <- c(wv$vis, vis)
 	wv
 }
 
-add.area <- function(wv, data, bottom=(wv$height/2), top, height, width, left=(wv$width/2), right, stroke.style) {
+add.area <- function(panel, data, bottom=(wv$height/2), top, height, width, left=(wv$width/2), right, stroke.style) {
 	multiplier <- (wv$height / max(data)) - 5
 	interval <- ((wv$width-30) / length(data))
 	vis <- paste("vis.add(pv.Area)",
@@ -181,41 +176,25 @@ new.panel <- function(wv, width=500, height=500) {
 	return(wv)
 }
 
-#' Pull data from the NY Times API
+#' Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.
 #'
 #' \tabular{ll}{
-#' Package: \tab nytR\cr
+#' Package: \tab webvis\cr
 #' Type: \tab Package\cr
 #' Version: \tab 0.1\cr
-#' Date: \tab 2009-12-23\cr
-#' License: \tab GPL (>= 2)\cr
+#' Date: \tab 2010-03-22\cr
+#' License: \tab BSD (>= 2)\cr
 #' LazyLoad: \tab no\cr
 #' }
 #'
-#' Pulls congressional data from NY Times API.  Currently only exposes the Congress API.  Requires an API key from \url{http://developer.nytimes.com/}.
+#' Uses Protovis to provide web graphics for R.
 #' 
-#' @name Rwebvis-package
-#' @aliases Rwebvis
+#' @name webvis-package
+#' @aliases webvis
 #' @docType package
-#' @title Pulls data from NY Times API.
+#' @title Web graphics for R.
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
-#' \url{http://developer.nytimes.com/}
+#' \url{http://vis.stanford.edu/protovis}
 #' @keywords package
 NULL
-
-
-
-wv <- new.webvis()
-wv <- new.panel(wv, width=1000)
-#wv <- add.bar(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- add.line(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- add.dot(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- add.wedge(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- add.wedge(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), inner.radius=80)
-#wv <- add.line(wv, data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2)))
-wv <- add.line(wv, data=data.frame(x=c(1, 1.2, 1.7, 1.5, .7, .5, .2), y=c(1, 1.2, 1.7, 1.5, .7, .5, .2)))
-#wv2 <- add.bar(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- add.area(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv2 <- add.dot(wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-render.webvis(wv)
