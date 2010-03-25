@@ -48,6 +48,21 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div></center>", getTail())
 }
 
+#' Add a line to the visualization.
+#'
+#' \code{add line} Adds a line plot to the visualization
+#'
+#' @param wv The webvis object containing the visualization. 
+#' @param width The width of the panel in pixels.
+#' @param height The width of the panel in pixels. 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+#' @examples
+#' 
 add.line <- function(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
 	if(!("x" %in% colnames(data)))
 		data$x <- 1:length(data$y)
@@ -140,6 +155,21 @@ add.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), righ
 	wv
 }
 
+#' Add a panel to the visualization.
+#'
+#' \code{new.panel} Adds a panel to the visualization
+#'
+#' @param wv The webvis object containing the visualization. 
+#' @param width The width of the panel in pixels.
+#' @param height The width of the panel in pixels. 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+#' @examples
+#' 
 protovis.data <- function(data) {
 	if(class(data) %in% c("character", "numeric", "vector") || ncol(data) == 1) {
 		data <- paste("[", 
@@ -200,6 +230,22 @@ new.panel <- function(wv, width=500, height=500) {
 }
 
 
+#' Simplified plot function for web vis plots.
+#'
+#' \code{plot.webvis} Simplified plot function for web vis plots
+#'
+#' @param data The webvis object containing the visualization. 
+#' @param type The type of plot.  Can be "bar", "line", "area", "pie", "dot", or "..."
+#' @param width The width of the panel in pixels.
+#' @param height The width of the panel in pixels. 
+#' @return Opens a plot.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+#' @examples
+#' 
 plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	if(!(class(data) == "data.frame") && is.vector(data))
 		data <- data.frame(y=data)
