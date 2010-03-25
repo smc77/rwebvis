@@ -10,11 +10,16 @@
 #
 ###############################################################################
 
-new.webvis <- function() {
+`%+%` <- function (parent, child) {
+	# check that the parent is a "webvis" object; if not, use normal + operation
+}
+
+new.webvis <- function(name=NULL, description=NULL) {
 	wv <- list(panel=NULL,
 		width=NULL, 
 		height=NULL,
 		vis=list())
+    class(wv) <- "webvis"
 	return(wv)
 }
 
@@ -284,7 +289,7 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 #' @keywords package
 NULL
 
-.First.lib <- function() {
+.onLoad <- function() {
 	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
 	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
 	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
