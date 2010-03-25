@@ -2,17 +2,11 @@
 # webvis: An R package to create web visualizations.
 # author: Shane Conway <shane.conway@gmail.com>
 #
-# This is released under a GPL license.
-#
-# Any reproduction of this code must include attribution to the NY Times.
+# This is released under a BSD license.
 #
 #
-# setwd("C:/Programming/src/R/")
-# library(roxygen)
-# roxygenize('webvis',
-#		roxygen.dir='rwebvis',
-#		copy.package=FALSE,
-#		unlink.target=FALSE)
+# Documentation was created using roxygen:
+# roxygenize('webvis', roxygen.dir='rwebvis', copy.package=FALSE, unlink.target=FALSE)
 #
 ###############################################################################
 
@@ -29,7 +23,7 @@ getTail <- function() {
 	return(t)
 }
 
-getHead <- function(title="", protovis.path="../protovis-r3.1.js") {
+getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
 	h <- paste("<html>
   <head>
     <title>", title, "</title>
@@ -40,7 +34,7 @@ getHead <- function(title="", protovis.path="../protovis-r3.1.js") {
 	return(h)
 }
 
-webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.path="../protovis-r3.1.js") {
+webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.path=PROTOVIS.PATH) {
 	c(getHead(title=title, protovis.path=protovis.path), 
 			paste("<center><div id='", div.id, "'>", sep=""), 
 		"<script type='text/javascript+protovis'>",
@@ -196,7 +190,9 @@ protovis.data <- function(data) {
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' 
-render.webvis <- function(wv, vis.name="demo", path="c:\\temp\\protovis-3.1\\examples\\", file.name=paste(path, vis.name, ".html", sep=""), con=file(file.name, "w"), title="", protovis.path="../protovis-r3.1.js") {
+render.webvis <- function(wv, vis.name="demo", path=OUTPUT.PATH, file.name=paste(path, vis.name, ".html", sep=""), title="", protovis.path=PROTOVIS.PATH) {
+	con=file(file.name, "w")
+	print(isOpen(con))
 	wv <- c(wv, render="vis.render();")
 	#check.webvis(wv)
 	writeLines(webvisToHTML(c(wv$panel, wv$vis, wv$render), title=title, protovis.path=protovis.path), con=con)
@@ -288,6 +284,12 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 #' @keywords package
 NULL
 
+.First.lib <- function() {
+	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
+	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
+	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
+	if(OUTPUT.PATH == "") OUTPUT.PATH <- path.expand("~/")
+}
 
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
