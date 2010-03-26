@@ -12,12 +12,39 @@
 
 `%+%` <- function (parent, child) {
 	# check that the parent is a "webvis" object; if not, use normal + operation
+	parent$vis <- c(parent$vis, child)
+	parent
 }
 
-new.webvis <- function(name=NULL, description=NULL) {
-	wv <- list(panel=NULL,
-		width=NULL, 
-		height=NULL,
+`+.webvis` <- function (parent, child) {
+	# check that the parent is a "webvis" object; if not, use normal + operation
+	parent$vis <- c(parent$vis, child)
+	parent
+}
+
+#' Add a panel to the visualization.
+#'
+#' \code{new.panel} Adds a panel to the visualization
+#'
+#' @param wv The webvis object containing the visualization. 
+#' @param width The width of the panel in pixels.
+#' @param height The width of the panel in pixels. 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+#' @examples
+#' 
+new.webvis <- function(name=NULL, description=NULL, width=500, height=500) {
+	wv <- list(name=NULL,
+		description=NULL, 
+		width=width,
+		height=height,
+		panel=paste("var vis = new pv.Panel()",
+				paste(".width(",width,")"),
+				paste(".height(",height,");"), sep="\n"),
 		vis=list())
     class(wv) <- "webvis"
 	return(wv)
@@ -62,7 +89,7 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' 
-add.line <- function(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
+pv.line <- function(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
 	if(!("x" %in% colnames(data)))
 		data$x <- 1:length(data$y)
 	vis <- paste("vis.add(pv.Line)",
@@ -74,11 +101,10 @@ add.line <- function(wv, data, bottom, top, left, right, line.width, stroke.styl
 			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
 			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
 			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
+	vis
 }
 
-add.bar <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
+pv.bar <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
 	if(!("x" %in% colnames(data)))
 		data$x <- 1:length(data$y)
 	vis <- paste("vis.add(pv.Bar)",
@@ -91,11 +117,10 @@ add.bar <- function(wv, data, bottom, height, top, left, right, width, stroke.st
 			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
 			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
 			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
+	vis
 }
 
-add.area <- function(wv, data, bottom, height, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
+pv.area <- function(wv, data, bottom, height, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
 	if(!("x" %in% colnames(data)))
 		data$x <- 1:length(data$y)
 	vis <- paste("vis.add(pv.Area)",
@@ -108,25 +133,10 @@ add.area <- function(wv, data, bottom, height, left, right, line.width, stroke.s
 			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
 			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
 			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
+	vis
 }
 
-add.wedge <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, inner.radius, outer.radius=(0.4 * min(wv$width, wv$height)), angle, start.angle, end.angle, stroke.style) {
-	print(data)
-	vis <- paste("vis.add(pv.Wedge)",
-			if(!missing(data)) paste(".data(pv.normalize(", protovis.data(data), "))") else "",
-			if(!missing(bottom) || length(bottom)) paste(".bottom(", bottom, ")") else "1",
-			if(!missing(left) || length(left)) paste(".left(", left, ")") else "2",
-			if(!missing(inner.radius) || length(inner.radius)) paste(".innerRadius(", inner.radius, ")") else "",
-			if(!missing(outer.radius) || length(outer.radius)) paste(".outerRadius(", outer.radius, ")") else "",
-			if(!missing(angle)) paste(".angle(", angle, ")", sep="") else ".angle(function(d) d * 2 * Math.PI)",
-			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
-}
-
-add.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE) {
+pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE) {
 	vis <- paste("vis.add(pv.Wedge)",
 			if(!missing(data)) paste(".data(pv.normalize(", protovis.data(data), "))") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(", wv$height/2, ")"),
@@ -136,11 +146,10 @@ add.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius,
 			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
 			if(!missing(angle)) paste(".angle(", angle, ")", sep="") else ".angle(function(d) d * 2 * Math.PI)",
 			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
+	vis
 }
 
-add.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, size, shape, stroke.style, fill.style) {
+pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, size, shape, stroke.style, fill.style) {
 	multiplier <- (wv$height / max(data)) - 5
 	interval <- ((wv$width-30) / length(data))
 	vis <- paste("vis.add(pv.Dot)",
@@ -150,8 +159,39 @@ add.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), righ
 			if(!missing(size)) paste(".size(function() this.index * ", interval, " + 15)") else "",
 			if(!missing(shape)) paste(".shape(", shape, "") else "",
 			";", sep="")
-	wv$vis <- c(wv$vis, vis)
-	wv
+	vis
+}
+
+pv.rule <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
+	if(!("x" %in% colnames(data)))
+		data$x <- 1:length(data$y)
+	vis <- paste("vis.add(pv.Rule)",
+			if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
+			if(!missing(bottom)) paste(".bottom(", bottom, ")") else if(("bottom" %in% colnames(data))) paste(".bottom(function(d) d.bottom", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")") else paste(".bottom(0)"),
+			if(!missing(height)) paste(".height(", height, ")") else paste(".height(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
+			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)) - 15), ")"),
+			if(!missing(width)) paste(".width(", width, ")") else paste(".width(", ((wv$width)/nrow(data))-25, ")"),
+			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
+			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
+			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
+			";", sep="")
+	vis
+}
+
+pv.label <- function(wv, data, bottom, height, top, left, right, width, textAlign, textBaseline, textMargin, textAngle, fill.style, equal.spacing=TRUE) {
+	if(!("x" %in% colnames(data)))
+		data$x <- 1:length(data$y)
+	vis <- paste("vis.add(pv.Label)",
+			if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
+			if(!missing(bottom)) paste(".bottom(", bottom, ")") else if(("bottom" %in% colnames(data))) paste(".bottom(function(d) d.bottom", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")") else paste(".bottom(0)"),
+			if(!missing(height)) paste(".height(", height, ")") else paste(".height(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
+			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)) - 15), ")"),
+			if(!missing(width)) paste(".width(", width, ")") else paste(".width(", ((wv$width)/nrow(data))-25, ")"),
+			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
+			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
+			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
+			";", sep="")
+	vis
 }
 
 #' Add a panel to the visualization.
@@ -205,32 +245,6 @@ render.webvis <- function(wv, vis.name="demo", path=OUTPUT.PATH, file.name=paste
 	browseURL(url=file.name)
 }
 
-#' Add a panel to the visualization.
-#'
-#' \code{new.panel} Adds a panel to the visualization
-#'
-#' @param wv The webvis object containing the visualization. 
-#' @param width The width of the panel in pixels.
-#' @param height The width of the panel in pixels. 
-#' @return A wv object.
-#' @keywords graphics
-#' @author Shane Conway \email{shane.conway@@gmail.com}
-#' @references
-#' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
-#' 
-new.panel <- function(wv, width=500, height=500) {
-	panel <- paste("var vis = new pv.Panel()",
-		paste(".width(",width,")"),
-		paste(".height(",height,");"), sep="\n")
-	wv$panel=panel
-	wv$width=width
-	wv$height=height
-	return(wv)
-}
-
-
 #' Simplified plot function for web vis plots.
 #'
 #' \code{plot.webvis} Simplified plot function for web vis plots
@@ -250,18 +264,17 @@ new.panel <- function(wv, width=500, height=500) {
 plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	if(!(class(data) == "data.frame") && is.vector(data))
 		data <- data.frame(y=data)
-	wv <- new.webvis()
-	wv <- new.panel(wv, width=width, height=height)
+	wv <- new.webvis(width=width, height=height)
 	wv <- if(type=="bar") {
-		add.bar(wv=wv, data=data, ...)
+		wv + pv.bar(wv, data=data, ...)
 	} else if(type=="line") {
-		add.line(wv=wv, data=data, ...)
+		wv + pv.line(wv, data=data, ...)
 	} else if(type=="dot") {
-		add.dot(wv=wv, data=data, ...)
+		wv + pv.dot(wv, data=data, ...)
 	} else if(type=="pie") {
-		add.wedge(wv=wv, data=data, ...)
+		wv + pv.wedge(wv, data=data, ...)
 	} else if(type=="area") {
-		add.area(wv=wv, data=data, ...)
+		wv + pv.area(wv, data=data, ...)
 	}
 	render.webvis(wv)
 }
@@ -293,8 +306,14 @@ NULL
 	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
 	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
 	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
-	if(OUTPUT.PATH == "") OUTPUT.PATH <- path.expand("~/")
+	if(OUTPUT.PATH == "") OUTPUT.PATH <- tempdir()
 }
+
+wv <- new.webvis()
+wv <- wv + pv.line(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
+wv <- wv + pv.rule(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
+wv <- wv + pv.label(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
+render.webvis(wv=wv)
 
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
