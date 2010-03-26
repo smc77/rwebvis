@@ -1,12 +1,12 @@
 Package: webvis
 Type: Package
 Title: Create graphics for the web from R.
-Version: 0.1
+Version: 0.0.1
 Date: 2010-03-14
-Author: Shane Conway, John Landers
+Author: Shane Conway
 Maintainer: Shane Conway <shane.conway@gmail.com>
-Description: Create graphics for the web from R.
-License: GPL-3
+Description: Create SVG graphics for the web from R.  Currently provides basic functionality from Protovis.
+License: BSD
 LazyLoad: no
-Depends: XML, plyr
 Collate: 'protovis.R'
+URL: http://code.google.com/p/rwebvis/
