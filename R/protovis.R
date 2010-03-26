@@ -37,15 +37,13 @@
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' 
-new.webvis <- function(name=NULL, description=NULL, width=500, height=500) {
+new.webvis <- function(name=NULL, root=pv.panel(...), description=NULL, width=500, height=500, ...) {
 	wv <- list(name=NULL,
 		description=NULL, 
 		width=width,
 		height=height,
-		panel=paste("var vis = new pv.Panel()",
-				paste(".width(",width,")"),
-				paste(".height(",height,");"), sep="\n"),
-		vis=list())
+		root=root,
+		branch=list())
     class(wv) <- "webvis"
 	return(wv)
 }
@@ -72,6 +70,13 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"<script type='text/javascript+protovis'>",
 		as.character(wv),
 		"</script></div></center>", getTail())
+}
+
+pv.panel <- function() {
+	vis <- paste("var vis = new pv.Panel()",
+			paste(".width(",width,")"),
+			paste(".height(",height,");"), sep="\n")
+	vis
 }
 
 #' Add a line to the visualization.
@@ -238,9 +243,9 @@ protovis.data <- function(data) {
 render.webvis <- function(wv, vis.name="demo", path=OUTPUT.PATH, file.name=paste(path, vis.name, ".html", sep=""), title="", protovis.path=PROTOVIS.PATH) {
 	con=file(file.name, "w")
 	print(isOpen(con))
-	wv <- c(wv, render="vis.render();")
+	wv <- c(wv, render="vis.root.render();")
 	#check.webvis(wv)
-	writeLines(webvisToHTML(c(wv$panel, wv$vis, wv$render), title=title, protovis.path=protovis.path), con=con)
+	writeLines(webvisToHTML(c(wv$root, wv$branch, wv$render), title=title, protovis.path=protovis.path), con=con)
 	close(con)
 	browseURL(url=file.name)
 }
