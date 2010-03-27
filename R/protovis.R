@@ -6,7 +6,7 @@
 #
 #
 # Documentation was created using roxygen:
-# roxygenize('webvis', roxygen.dir='rwebvis', copy.package=FALSE, unlink.target=FALSE)
+# roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
 #
 ###############################################################################
 
@@ -17,26 +17,12 @@
 	parent
 }
 
-#' Add a panel to the visualization.
-#'
-#' \code{new.panel} Adds a panel to the visualization
-#'
-#' @param wv The webvis object containing the visualization. 
-#' @param width The width of the panel in pixels.
-#' @param height The width of the panel in pixels. 
-#' @return A wv object.
-#' @keywords graphics
-#' @author Shane Conway \email{shane.conway@@gmail.com}
-#' @references
-#' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
-#' 
-new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, ...) {
+new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset, ...) {
 	wv <- list(name="vis",
 		description=NULL, 
 		width=width,
 		height=height,
+		data=dataset,
 		root=root,
 		branch=list())
     class(wv) <- "webvis"
@@ -67,80 +53,138 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div></center>", getTail())
 }
 
-pv.panel <- function(width=300, height=200, data) {
+field.exists <- function(field, data) {
+	if(!missing(data)) if(is.data.frame(data)) { if(any(field %in% colnames(data))) return(TRUE) } else { stop("data should be a data.frame")}
+	FALSE
+}
+
+pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale="linear") {
+	if(!missing(data) && field.exists(field=field, data=data)) { 
+		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", min(data[,field]), ", ", max(data[,field]), ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
+	} else if(!missing(value)) {
+		return(paste(".", name, "(", pv.data(value), ")")) 
+	}  
+	if(!missing(default)) {
+		paste(".", name, "(", pv.data(default), ")") 
+	} else {
+		""
+	}
+}
+
+pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
 	vis <- list(type="pv.Panel",
-			parameters=paste(paste(".width(",width,")"),
-			paste(".height(",height,");"), sep="\n"))
+			parameters=collapse(
+				pv.parameter("data", value=data),
+				pv.parameter("width", value=width),
+				pv.parameter("height", value=height),
+				pv.parameter("left", value=left),
+				pv.parameter("right", value=right),
+				pv.parameter("bottom", value=bottom),
+				pv.parameter("top", value=top)
+	))
 	vis
 }
+pv.panel()
+
+
+pv.dataset <- function(data, name) {
+	paste("var", name, "=", pv.data(data))
+}
+pv.dataset(data=wheat, name="wheat")
+
 
 #' Add a line to the visualization.
 #'
-#' \code{add line} Adds a line plot to the visualization
+#' \code{pv.line} Adds a line plot to the visualization
 #'
 #' @param wv The webvis object containing the visualization. 
-#' @param width The width of the panel in pixels.
-#' @param height The width of the panel in pixels. 
+#' @param data The webvis object containing the visualization. 
+#' @param bottom The width of the panel in pixels.
+#' @param top The width of the panel in pixels.
+#' @param left The width of the panel in pixels.
+#' @param right The width of the panel in pixels.
+#' @param line.width The width of the panel in pixels.
+#' @param stroke.style The width of the panel in pixels.
+#' @param fill.style The width of the panel in pixels.
+#' @param interpolate The width of the panel in pixels.
+#' @param spacing The width of the panel in pixels. 
+#' @param equal.spacing The width of the panel in pixels.
 #' @return A wv object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
+# @examples
 #' 
-pv.line <- function(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, spacing=10, equal.spacing=TRUE) {
-	if(!("x" %in% colnames(data)))
+pv.line <- function(wv, data, y.name="y", x.name="x", bottom, top, left, right, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, interpolate, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear") {
+	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
-	if(equal.spacing) width <- ((wv$width)/nrow(data)-spacing) else if(missing(width)) width <- 10
 	vis <- list(type="pv.Line",
-			parameters=paste(if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
-			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) (d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)), ")-", width) else ")", ")"),
-			if(!missing(line.width)) paste(".lineWidth(", line.width, ")") else "",
-			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
-			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
-			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
-			";", sep=""))
+			parameters=collapse(
+				pv.parameter("data", value=data),
+				pv.parameter("bottom", data=data, field="y", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+				pv.parameter("left", data=data, field="x", value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+				pv.parameter("lineWidth", data=data, field="line.width", value=line.width, scale=NA),
+				pv.parameter("strokeStyle", value=stroke.style),
+				pv.parameter("fillStyle", value=fill.style),
+				pv.parameter("interpolate", value=interpolate),
+				pv.parameter("segmented", value=segmented),
+				";"))
 	vis
 }
 
-pv.bar <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, interpolate, spacing=1, equal.spacing=TRUE) {
-	if(!("x" %in% colnames(data)))
-		data$x <- 1:length(data$y)
-	if(missing(width) && equal.spacing) width <- ((wv$width)/nrow(data)-spacing) else if(missing(width)) width <- 10
+pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
+
+plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
+plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
+
+pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin=y.padding, ymax, scale="linear") {
+	if(!missing(data) && !field.exists("x", data))
+		dataset$x <- 1:length(data$y)
+	if(!missing(data) && missing(bar.width)) bar.width <- (((wv$width)/nrow(data))-(x.padding))
 	vis <- list(type="pv.Bar",
-			parameters=paste(if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else if(("bottom" %in% colnames(data))) paste(".bottom(function(d) d.bottom", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")") else paste(".bottom(0)"),
-			if(!missing(height)) paste(".height(", height, ")") else paste(".height(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
-			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) ", if(equal.spacing) paste("(d.x *", (wv$width / max(data$x)), ") - ",width, ")") else "d.x)"),
-			paste(".width(", width, ")"),
-			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
-			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
-			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
-			";", sep=""))
+			parameters=collapse(
+					pv.parameter("data", value=data),
+					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("height", data=data, field=y.name, range.min=ymin, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("left", data=data, field=x.name, value=left, range.min=x.padding, range.max=wv$width-bar.width, scale=scale),
+					pv.parameter("width", data=data, field="bar.width", value=bar.width, scale=NA),
+					pv.parameter("lineWidth", data=data, field="line.width", value=line.width, scale=NA),
+					pv.parameter("strokeStyle", value=stroke.style),
+					pv.parameter("fillStyle", value=fill.style),
+					pv.parameter("segmented", value=segmented),
+					";"))
 	vis
 }
 
-pv.area <- function(wv, data, bottom, height, left, right, line.width, stroke.style, fill.style, interpolate, equal.spacing=TRUE) {
-	if(!("x" %in% colnames(data)))
+pv.bar()
+
+plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
+
+pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear") {
+	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Area",
-			parameters=paste(if(!missing(data)) paste(".data(pv.normalize(", protovis.data(data), "))") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(0)"),
-			if(!missing(height)) paste(".height(", height, ")") else paste(".height(function(d) d.y", if(equal.spacing) paste("*", (wv$height / max(data$y)) - 5), ")"),
-			if(!missing(left)) paste(".left(", left, ")") else paste(".left(function(d) d.x", if(equal.spacing) paste("*", (wv$width / max(data$x)) - 5), ")"),
-			if(!missing(line.width)) paste(".lineWidth(", line.width, ")") else "",
-			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
-			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
-			if(!missing(interpolate)) paste(".interpolate(", interpolate, ")") else "", 
-			";", sep=""))
+			parameters=collapse(
+					pv.parameter("data", value=data),
+					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("height", data=data, field=y.name, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("left", data=data, field=x.name, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+					pv.parameter("lineWidth", data=data, field="line.width", value=line.width, scale=NA),
+					pv.parameter("strokeStyle", value=stroke.style),
+					pv.parameter("fillStyle", value=fill.style),
+					pv.parameter("interpolate", value=interpolate),
+					pv.parameter("segmented", value=segmented),
+					";"))
 	vis
 }
+
+plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 
 pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE) {
 	vis <- list(type="pv.Wedge",
-			parameters=paste(if(!missing(data)) paste(".data(pv.normalize(", protovis.data(data), "))") else "",
+			parameters=paste(if(!missing(data)) paste(".data(pv.normalize(", pv.data(data), "))") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(", wv$height/2, ")"),
 			if(!missing(left)) paste(".left(", left, ")") else paste(".left(", wv$width/2, ")"),
 			if(!missing(inner.radius)) paste(".innerRadius(", inner.radius, ")") else "",
@@ -155,7 +199,7 @@ pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right
 	multiplier <- (wv$height / max(data)) - 5
 	interval <- ((wv$width-30) / length(data))
 	vis <- list(type="pv.Dot",
-			parameters=paste(if(!missing(data) || length(data)) paste(".data(", protovis.data(data), ")") else "",
+			parameters=paste(if(!missing(data) || length(data)) paste(".data(", pv.data(data), ")") else "",
 			if(!missing(bottom) || length(bottom)) paste(".bottom(function(d) d * ", multiplier, ")"),
 			if(!missing(left) || length(left)) paste(".left(function() this.index * ", interval, " + 15)"),
 			if(!missing(size)) paste(".size(function() this.index * ", interval, " + 15)") else "",
@@ -169,7 +213,7 @@ pv.rule <- function(wv, data, bottom, height, top, left, right, width, stroke.st
 		if(!("x" %in% colnames(data)))
 			data$x <- 1:length(data$y)
 	vis <- list(type="pv.Rule",
-			parameters=paste(if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
+			parameters=paste(if(!missing(data)) paste(".data(", pv.data(data), ")") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else "",
 			if(!missing(height)) paste(".height(", height, ")") else "",
 			if(!missing(left)) paste(".left(", left, ")") else "",
@@ -185,7 +229,7 @@ pv.label <- function(wv, data, bottom, height, top, left, right, width, text, te
 		if(!("x" %in% colnames(data)))
 			data$x <- 1:length(data$y)
 	vis <- list(type="pv.Label",
-			parameters=paste(if(!missing(data)) paste(".data(", protovis.data(data), ")") else "",
+			parameters=paste(if(!missing(data)) paste(".data(", pv.data(data), ")") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else "", 
 			if(!missing(height)) paste(".height(", height, ")") else "",
 			if(!missing(left)) paste(".left(", left, ")") else "",
@@ -199,21 +243,22 @@ pv.label <- function(wv, data, bottom, height, top, left, right, width, text, te
 
 #' Add a panel to the visualization.
 #'
-#' \code{new.panel} Adds a panel to the visualization
+#' \code{protovis.data} Adds a panel to the visualization
 #'
-#' @param wv The webvis object containing the visualization. 
-#' @param width The width of the panel in pixels.
-#' @param height The width of the panel in pixels. 
+#' @param data The webvis object containing the visualization. 
 #' @return A wv object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
+# @examples
 #' 
-protovis.data <- function(data) {
-	if(class(data) %in% c("character", "numeric", "vector") || ncol(data) == 1) {
+pv.data <- function(data) {
+	if(is.character(data) && length(data)==1) return(collapse("'", data, "'"))
+	if(is.numeric(data) && length(data)==1) return(data)
+	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
+	if(is.vector(data)) {
 		data <- paste("[", 
 				paste(as.matrix(data), collapse=", "), 
 				"]", sep="")		
@@ -230,13 +275,16 @@ protovis.data <- function(data) {
 #' @param wv The webvis object containing the visualization. 
 #' @param vis.name The file name of the output HTML.
 #' @param path The file path to the HTML file. 
+#' @param file.name The file path to the HTML file. 
+#' @param title The file path to the HTML file. 
+#' @param protovis.path The file path to the HTML file.
 #' @return A wv object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
+# @examples
 #' 
 render.webvis <- function(wv, vis.name="demo", path=OUTPUT.PATH, file.name=paste(path, vis.name, ".html", sep=""), title="", protovis.path=PROTOVIS.PATH) {
 	con=file(file.name, "w")
@@ -279,7 +327,7 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
+# @examples
 #' 
 plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	if(!(class(data) == "data.frame") && is.vector(data))
@@ -324,7 +372,9 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 #' @keywords package
 NULL
 
-.onLoad <- function() {
+collapse <- function(...) paste(c(...), collapse="")
+
+.onLoad <- function(lib, pkg="webvis") {
 	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
 	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
 	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
@@ -332,17 +382,18 @@ NULL
 }
 
 #
-wv <- new.webvis()
-wv <- wv + pv.bar(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
-render.webvis(wv=wv)
-
-wv <- new.webvis()
-line <- new.webvis(root=pv.line(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2))))
-line <- line + pv.label(line, text.style="white", anchor="top") 
-wv <- wv + line
-wv <- wv + pv.rule(wv, bottom=0)
-wv <- wv + pv.rule(wv, left=0)
-render.webvis(wv=wv)
+##
+#wv <- new.webvis()
+#wv <- wv + pv.bar(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
+#render.webvis(wv=wv)
+#
+#wv <- new.webvis()
+#line <- new.webvis(root=pv.line(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2))))
+#line <- line + pv.label(line, text.style="white", anchor="top") 
+#wv <- wv + line
+#wv <- wv + pv.rule(wv, bottom=0)
+#wv <- wv + pv.rule(wv, left=0)
+#render.webvis(wv=wv)
 
 #
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
