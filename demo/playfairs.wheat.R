@@ -85,7 +85,6 @@ wheat <- read.csv(con <- textConnection(
 						1821, 54, 30"), header=TRUE)
 close(con)
 wheat$wages <- as.numeric(wheat$wages)
-wheat$wages[51:53] <- NA
 #save(monarch, wheat, file="c:/Programming/src/R/webvis/data/pw.demo.Rda")
 
 wv <- new.webvis(root=pv.panel(right=60, top=20, width=800, height=445), width=800, height=445)
@@ -126,4 +125,4 @@ vm <- vm + pv.mark(wv=wv, data=monarch2, type="Label",
 		anchor="center")
 wv2 <- wv + vm
 
-render.webvis(wv=wv2, vis.name="/playfairs_wheat")
+render.webvis(wv=wv2, vis.name="playfairs_wheat")
