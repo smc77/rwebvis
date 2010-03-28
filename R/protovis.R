@@ -17,7 +17,7 @@
 	parent
 }
 
-new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset, ...) {
+new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset=NULL, ...) {
 	wv <- list(name="vis",
 		description=NULL, 
 		width=width,
@@ -58,9 +58,9 @@ field.exists <- function(field, data) {
 	FALSE
 }
 
-pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale="linear") {
+pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale="linear") {
 	if(!missing(data) && field.exists(field=field, data=data)) { 
-		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", min(data[,field]), ", ", max(data[,field]), ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
+		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
 	} else if(!missing(value)) {
 		return(paste(".", name, "(", pv.data(value), ")")) 
 	}  
@@ -117,20 +117,21 @@ pv.dataset(data=wheat, name="wheat")
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 # @examples
 #' 
-pv.line <- function(wv, data, y.name="y", x.name="x", bottom, top, left, right, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, interpolate, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear") {
+pv.line <- function(wv, data, y.name="y", x.name="x", bottom, top, left, right, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, interpolate, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Line",
 			parameters=collapse(
 				pv.parameter("data", value=data),
-				pv.parameter("bottom", data=data, field="y", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-				pv.parameter("left", data=data, field="x", value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+				pv.parameter("bottom", data=data, field="y", value=bottom, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+				pv.parameter("left", data=data, field="x", value=left, scale.min=xmin, scale.max=xmax, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
 				pv.parameter("lineWidth", data=data, field="line.width", value=line.width, scale=NA),
 				pv.parameter("strokeStyle", value=stroke.style),
 				pv.parameter("fillStyle", value=fill.style),
 				pv.parameter("interpolate", value=interpolate),
 				pv.parameter("segmented", value=segmented),
-				";"))
+				";"),
+		anchor=anchor)
 	vis
 }
 
@@ -139,9 +140,9 @@ pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), fi
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
 plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
 
-pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin=y.padding, ymax, scale="linear") {
+pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin=y.padding, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
-		dataset$x <- 1:length(data$y)
+		data$x <- 1:length(data$y)
 	if(!missing(data) && missing(bar.width)) bar.width <- (((wv$width)/nrow(data))-(x.padding))
 	vis <- list(type="pv.Bar",
 			parameters=collapse(
@@ -154,7 +155,8 @@ pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, rig
 					pv.parameter("strokeStyle", value=stroke.style),
 					pv.parameter("fillStyle", value=fill.style),
 					pv.parameter("segmented", value=segmented),
-					";"))
+					";"),
+			anchor=anchor)
 	vis
 }
 
@@ -162,27 +164,28 @@ pv.bar()
 
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
 
-pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear") {
+pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Area",
 			parameters=collapse(
 					pv.parameter("data", value=data),
 					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-					pv.parameter("height", data=data, field=y.name, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-					pv.parameter("left", data=data, field=x.name, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+					pv.parameter("height", data=data, field=y.name, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
 					pv.parameter("lineWidth", data=data, field="line.width", value=line.width, scale=NA),
 					pv.parameter("strokeStyle", value=stroke.style),
 					pv.parameter("fillStyle", value=fill.style),
 					pv.parameter("interpolate", value=interpolate),
 					pv.parameter("segmented", value=segmented),
-					";"))
+					";"),
+			anchor=anchor)
 	vis
 }
 
 plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 
-pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE) {
+pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE, anchor=NULL) {
 	vis <- list(type="pv.Wedge",
 			parameters=paste(if(!missing(data)) paste(".data(pv.normalize(", pv.data(data), "))") else "",
 			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(", wv$height/2, ")"),
@@ -191,7 +194,8 @@ pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, 
 			if(!missing(outer.radius)) paste(".outerRadius(", outer.radius, ")") else paste(".outerRadius(", min(wv$width,wv$height)/2, ")"),
 			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
 			if(!missing(angle)) paste(".angle(", angle, ")", sep="") else ".angle(function(d) d * 2 * Math.PI)",
-			";", sep=""))
+			";", sep=""),
+	anchor=anchor)
 	vis
 }
 
@@ -204,42 +208,44 @@ pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right
 			if(!missing(left) || length(left)) paste(".left(function() this.index * ", interval, " + 15)"),
 			if(!missing(size)) paste(".size(function() this.index * ", interval, " + 15)") else "",
 			if(!missing(shape)) paste(".shape(", shape, "") else "",
-			";", sep=""))
-	vis
-}
-
-pv.rule <- function(wv, data, bottom, height, top, left, right, width, stroke.style, fill.style, equal.spacing=TRUE) {
-	if(!missing(data))
-		if(!("x" %in% colnames(data)))
-			data$x <- 1:length(data$y)
-	vis <- list(type="pv.Rule",
-			parameters=paste(if(!missing(data)) paste(".data(", pv.data(data), ")") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else "",
-			if(!missing(height)) paste(".height(", height, ")") else "",
-			if(!missing(left)) paste(".left(", left, ")") else "",
-			if(!missing(width)) paste(".width(", width, ")") else "",
-			if(!missing(stroke.style)) paste(".strokeStyle(", stroke.style, ")") else "", 
-			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
-			";", sep=""))
-	vis
-}
-
-pv.label <- function(wv, data, bottom, height, top, left, right, width, text, textAlign, textBaseline, textMargin, textAngle, text.style, equal.spacing=TRUE, anchor=NULL) {
-	if(!missing(data))
-		if(!("x" %in% colnames(data)))
-			data$x <- 1:length(data$y)
-	vis <- list(type="pv.Label",
-			parameters=paste(if(!missing(data)) paste(".data(", pv.data(data), ")") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else "", 
-			if(!missing(height)) paste(".height(", height, ")") else "",
-			if(!missing(left)) paste(".left(", left, ")") else "",
-			if(!missing(width)) paste(".width(", width, ")") else "",
-			if(!missing(text)) paste(".text(", text, ")") else paste(".text(function(d) d.y)") , 
-			if(!missing(text.style)) paste(".textStyle('", text.style, "')") else "", 
 			";", sep=""),
+	anchor=anchor)
+	vis
+}
+
+pv.rule <- function(wv, data, y.name="y", x.name="x", bottom, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
+	if(!missing(data) && !field.exists("x", data))
+		data$x <- 1:length(data$y)
+	vis <- list(type="pv.Rule",
+			parameters=collapse(
+					pv.parameter("data", value=data),
+					pv.parameter("bottom", data=data, field=y.name, scale.min=ymin, scale.max=ymax, value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					#pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+					pv.parameter("strokeStyle", value=stroke.style),
+					pv.parameter("fillStyle", value=fill.style),
+					pv.parameter("interpolate", value=interpolate),
+					";"),
 			anchor=anchor)
 	vis
 }
+
+pv.label <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, width, text, font, textAlign, textBaseline, textMargin, textAngle, text.style, anchor=NULL) {
+	if(!missing(data) && !field.exists("x", data))
+		data$x <- 1:length(data$y)
+	vis <- list(type="pv.Label",
+			parameters=collapse(
+					pv.parameter("data", value=data),
+					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("height", data=data, field=y.name, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+					pv.parameter("text", value=text),
+					pv.parameter("font", value=font),
+					pv.parameter("text.style", value=text.style),
+					";"),
+			anchor=anchor)
+	vis
+}
+
 
 #' Add a panel to the visualization.
 #'
