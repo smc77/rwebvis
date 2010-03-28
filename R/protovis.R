@@ -58,16 +58,47 @@ field.exists <- function(field, data) {
 	FALSE
 }
 
-pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale="linear") {
-	if(!missing(data) && field.exists(field=field, data=data)) { 
-		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
-	} else if(!missing(value)) {
-		return(paste(".", name, "(", pv.data(value), ")")) 
+pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL, default=NULL) {
+	if(missing(name)) stop("'name' is a required field for a webvis.param")
+	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, range.min=range.min, range.max=range.max, scale.min=scale.min, scale.max=scale.max)
+	class(param) <- "webvis.param"
+	param
+}
+
+pv.param(data="a")
+pv.param(name="a")
+
+pv.scale <- function(type, width, height, data=NULL, data.name=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL) {
+	type <- unlist(strsplit(type, ".", fixed=TRUE))
+	if(length(type) != 3) stop("scale type must be of format type.datarange.scale.range (e.g. linear.y.y)")
+	if(is.null(data.name)) data.name <- type[2]
+	if(is.null(range.max)) range.max <- if(type[3] == "y") height else width
+	if(is.null(range.min)) range.min <- 0
+	type <- type[1]
+	collapse("pv.Scale.", type, "(", 
+			if(is.null(scale.min)) min(data[,data.name]) else scale.min, ", ", 
+			if(is.null(scale.max)) max(data[,data.name]) else scale.max, 
+			").range(", range.min, ",", range.max, ")")
+}
+
+pv.parse <- function(param, wv, data) {
+	if(!class(param) == "webvis.param") stop(paste("Function pv.parse expects a webvis.param input but received", class(param), "instead"))
+	if(!missing(data) && !field.exists("x", data)) 
+		data$x <- 1:length(data$y)
+	print(param$value)
+	if(!is.null(param$value)) if(param$value == "d") param$value <- data
+	if(is.null(param$data) && !missing(data)) param$data <- data
+	if(!is.null(param$data) && field.exists(field=param$data.name, data=param$data)) { 
+		return(collapse(".", param$name, "(function(d) ", 
+				if(!is.null(param$scale)) pv.scale(type=param$scale, width=wv$width, height=wv$height, data=param$data, range.min=param$range.min, range.max=param$range.max, scale.min=param$scale.min, scale.max=param$scale.max) else "", 
+					"(d.", param$data.name, ")", ")"))
+	} else if(!is.null(param$value)) {
+		return(collapse(".", param$name, "(", pv.data(param$value), ")")) 
 	}  
-	if(!missing(default)) {
-		paste(".", name, "(", pv.data(default), ")") 
+	if(!is.null(param$default)) {
+		collapse(".", param$name, "(", pv.data(param$default), ")") 
 	} else {
-		""
+		collapse(".", param$name)
 	}
 }
 
@@ -117,7 +148,7 @@ pv.dataset(data=wheat, name="wheat")
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 # @examples
 #' 
-pv.line <- function(wv, data, y.name="y", x.name="x", bottom, top, left, right, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, interpolate, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
+pv.line <- function(wv, data, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, interpolate, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL, ...) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Line",
@@ -134,6 +165,19 @@ pv.line <- function(wv, data, y.name="y", x.name="x", bottom, top, left, right, 
 		anchor=anchor)
 	vis
 }
+
+pv.mark <- function(wv, type, data, ..., anchor=NULL) {
+	vis <- list(type=collapse("pv.", type),
+			parameters=collapse(
+					unlist(lapply(list(...), function(x, data, wv) {
+						if(!is.null(x$data) && is.null(x$data.name)) pv.parse(x, wv=wv) else pv.parse(x, wv=wv, data=data)
+					}, data=data, wv=wv)),";"),
+			anchor=anchor)
+	vis
+}
+pv.mark(wv=wv, type="Line", data=data.frame(y=1:5), 
+		pv.param(name="data", value=data), 
+		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
 
 pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
 
@@ -400,6 +444,8 @@ collapse <- function(...) paste(c(...), collapse="")
 #wv <- wv + pv.rule(wv, bottom=0)
 #wv <- wv + pv.rule(wv, left=0)
 #render.webvis(wv=wv)
+
+
 
 #
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
