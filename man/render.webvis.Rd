@@ -1,7 +1,8 @@
 \name{render.webvis}
 \alias{render.webvis}
 \title{Create the final visualization from the webvis object.}
-\usage{render.webvis(wv, vis.name="demo", path=OUTPUT.PATH, file.name=paste(path, vis.name, ".html", sep = ""), title="",
+\usage{render.webvis(wv, vis.name="demo", path=OUTPUT.PATH,
+    file.name=paste(path, vis.name, ".html", sep = ""), title="",
     protovis.path=PROTOVIS.PATH)}
 \description{Create the final visualization from the webvis object.}
 \details{\code{render.webvis} Renders the visualization from the webvis object.}

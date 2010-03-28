@@ -5,8 +5,9 @@ Version: 0.0.1
 Date: 2010-03-14
 Author: Shane Conway
 Maintainer: Shane Conway <shane.conway@gmail.com>
-Description: Create SVG graphics for the web from R.  Currently provides basic functionality from Protovis.
+Description: Create SVG graphics for the web from R.  Currently
+    provides basic functionality from Protovis.
 License: BSD
 LazyLoad: no
-Collate: 'protovis.R'
 URL: http://code.google.com/p/rwebvis/
+Collate: 'protovis.R' 'util.R' 'zzz.R'

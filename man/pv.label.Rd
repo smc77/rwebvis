@@ -1,5 +1,6 @@
 \name{pv.label}
 \alias{pv.label}
 \title{pv.label}
-\usage{pv.label(wv, data, bottom, height, top, left, right, width, text, textAlign, textBaseline, textMargin, textAngle,
-    text.style, equal.spacing=TRUE, anchor)}
+\usage{pv.label(wv, data, y.name="y", x.name="x", bottom=0, height, left,
+    right, width, text, font, textAlign, textBaseline, textMargin,
+    textAngle, text.style, anchor)}

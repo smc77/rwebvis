@@ -5,7 +5,7 @@
 # This is released under a BSD license.
 #
 # Documentation was created using roxygen:
-# roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
+# NAMESPACE.FILE <- FALSE; roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
 #
 ###############################################################################
 

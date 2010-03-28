@@ -1,8 +1,13 @@
 \name{pv.line}
 \alias{pv.line}
 \title{Add a line to the visualization.}
-\usage{pv.line(wv, data, bottom, top, left, right, line.width, stroke.style, fill.style, interpolate, spacing=10,
-    equal.spacing=TRUE)}
+\usage{pv.line(wv, data, bottom, bottom.name, bottom.scale, top, top.name,
+    top.scale, left, left.name, left.scale, right, right.name,
+    right.scale, line.width, stroke.style,
+    segmented=(!missing(line.width) || field.exists(field = "width",
+    data = data)), fill.style, interpolate, x.padding=(wv$width)/50,
+    y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear",
+    anchor, ...)}
 \description{Add a line to the visualization.}
 \details{\code{pv.line} Adds a line plot to the visualization}
 \value{A wv object.}

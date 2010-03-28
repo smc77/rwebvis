@@ -9,9 +9,10 @@
 #
 ###############################################################################
 
-.onLoad <- function(lib, pkg="webvis") {
-	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
-	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
-	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
-	if(OUTPUT.PATH == "") OUTPUT.PATH <- tempdir()
+.onLoad <- function(lib, pkg) {
+	print("Welcome to the webvis pacakge.")
+	PROTOVIS.PATH <<- as.character(Sys.getenv("PROTOVIS_PATH"))
+	if(PROTOVIS.PATH == "") PROTOVIS.PATH <<- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
+	OUTPUT.PATH <<- as.character(Sys.getenv("WEBVIS_PATH"))
+	if(OUTPUT.PATH == "") OUTPUT.PATH <<- tempdir()
 }

@@ -26,7 +26,6 @@ George II, 1727, 1760, 0
 George III, 1760, 1820, 0
 George IV, 1820, 1821, 0"), header=TRUE, as.is=TRUE)
 close(con)
-class(monarch$name)
 monarch$name <- sapply(monarch$name, function(x) collapse("'", x, "'"))
 
 wheat <- read.csv(con <- textConnection(
@@ -86,6 +85,8 @@ wheat <- read.csv(con <- textConnection(
 						1821, 54, 30"), header=TRUE)
 close(con)
 wheat$wages <- as.numeric(wheat$wages)
+wheat$wages[51:53] <- NA
+#save(monarch, wheat, file="c:/Programming/src/R/webvis/data/pw.demo.Rda")
 
 wv <- new.webvis(root=pv.panel(right=60, top=20, width=800, height=445), width=800, height=445)
 
@@ -107,7 +108,7 @@ wv <- wv + wr
 monarch2 <- monarch
 monarch2$top <- ifelse(monarch2$commonwealth == 0 & as.numeric(rownames(monarch2)) %% 2 == 0, 15, 10)
 monarch2$fill <- ifelse(monarch2$commonwealth == 0, "'#000'", "'#fff'")
-monarch2$reign <- (monarch2$end-monarch2$start) * (width/(max(monarch2$end)-min(monarch2$start)))
+monarch2$reign <- (monarch2$end-monarch2$start) * (wv$width/(max(monarch2$end)-min(monarch2$start)))
 vm <- new.webvis(root=pv.mark(wv=wv, data=monarch2, type="Bar",  
 		pv.param(name="data", value="d"), 
 		pv.param(name="height", value=5),
@@ -125,4 +126,4 @@ vm <- vm + pv.mark(wv=wv, data=monarch2, type="Label",
 		anchor="center")
 wv2 <- wv + vm
 
-render.webvis(wv=wv2, vis.name="demo2")
+render.webvis(wv=wv2, vis.name="/playfairs_wheat")

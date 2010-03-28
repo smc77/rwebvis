@@ -37,6 +37,19 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div></center>", getTail())
 }
 
+pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale="linear") {
+	if(!missing(data) && field.exists(field=field, data=data)) { 
+		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
+	} else if(!missing(value)) {
+		return(paste(".", name, "(", pv.data(value), ")")) 
+	}  
+	if(!missing(default)) {
+		paste(".", name, "(", pv.data(default), ")") 
+	} else {
+		""
+	}
+}
+
 pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL, default=NULL, quote=TRUE) {
 	if(missing(name)) stop("'name' is a required field for a webvis.param")
 	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, range.min=range.min, range.max=range.max, scale.min=scale.min, scale.max=scale.max, quote=quote)
@@ -93,11 +106,23 @@ pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
 #pv.panel()
 
 
+
+#' Add a dataset as a variable to the visualization.
+#'
+#' \code{pv.dataset} Add a dataset as a variable to the visualization.
+#'
+#' @param data The dataset to be used in the graphic.
+#' @param name
+#' @return A string of the relevant javascript.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' pv.dataset(data=wheat, name="wheat")
 pv.dataset <- function(data, name) {
 	paste("var", name, "=", pv.data(data))
 }
-#pv.dataset(data=wheat, name="wheat")
-
 
 #' Add a line to the visualization.
 #'
