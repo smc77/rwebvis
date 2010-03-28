@@ -1,23 +1,33 @@
-# TODO: Add comment
-# 
-# Author: TMC
+#
+# webvis: An R package to create web visualizations.
+# author: Shane Conway <shane.conway@gmail.com>
+#
+# demo example from http://vis.stanford.edu/protovis/ex/wheat.html
+#
+# This is released under a BSD license.
+#
+# Documentation was created using roxygen:
+# roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
+#
 ###############################################################################
 
 monarch <- read.csv(con <- textConnection(
-				"name, start, end, commonwealth
-						Elizabeth, 1565, 1603, 0
-						James I, 1603, 1625, 0
-						Charles I, 1625, 1649, 0
-						Cromwell, 1649, 1660, 1
-						Charles II, 1660, 1685, 0
-						James II, 1685, 1689, 0
-						W&M, 1689, 1702, 0
-						Anne, 1702, 1714, 0
-						George I, 1714, 1727, 0
-						George II, 1727, 1760, 0
-						George III, 1760, 1820, 0
-						George IV, 1820, 1821, 0"), header=TRUE)
+"name, start, end, commonwealth
+Elizabeth, 1565, 1603, 0
+James I, 1603, 1625, 0
+Charles I, 1625, 1649, 0
+Cromwell, 1649, 1660, 1
+Charles II, 1660, 1685, 0
+James II, 1685, 1689, 0
+W&M, 1689, 1702, 0
+Anne, 1702, 1714, 0
+George I, 1714, 1727, 0
+George II, 1727, 1760, 0
+George III, 1760, 1820, 0
+George IV, 1820, 1821, 0"), header=TRUE, as.is=TRUE)
 close(con)
+class(monarch$name)
+monarch$name <- sapply(monarch$name, function(x) collapse("'", x, "'"))
 
 wheat <- read.csv(con <- textConnection(
 				"year, wheat, wages
@@ -94,23 +104,25 @@ wr <- new.webvis(root=pv.rule(bottom=-0.5))
 wr <- wr + pv.rule(wv=wv, data=data.frame(y=seq(0,100,10)), bottom=0, y.name="y", y.padding=0, ymin=0, ymax=100)
 wv <- wv + wr
 
-#wm <- new.webvis(root=pv.bar(wv, data=monarch, height=5, y.name="wages", x.name="year", x.padding=0, y.padding=0, ymin=0, ymax=100, fill.style="hsla(195, 50%, 80%, .75)"))
-
-
-width <- 800
 monarch2 <- monarch
-monarch2$top <- ifelse(monarch2$commonwealth == 0 & as.numeric(rownames(monarch2)) %% 2 == 0, 10, 15)
+monarch2$top <- ifelse(monarch2$commonwealth == 0 & as.numeric(rownames(monarch2)) %% 2 == 0, 15, 10)
+monarch2$fill <- ifelse(monarch2$commonwealth == 0, "'#000'", "'#fff'")
 monarch2$reign <- (monarch2$end-monarch2$start) * (width/(max(monarch2$end)-min(monarch2$start)))
 vm <- new.webvis(root=pv.mark(wv=wv, data=monarch2, type="Bar",  
-				pv.param(name="data", value="d"), 
-				pv.param(name="height", value=5),
-				pv.param(name="strokeStyle", value="#000"),
-				pv.param(name="left", data.name="start", scale="linear.start.x"),
-				pv.param(name="top", data.name="top"),
-				pv.param(name="width", data.name="reign",
-				pv.param(name="fillStyle", data.name="reign") 
-		))
-vm <- vm + pv.label(left=130, bottom=31, font="italic 10px serif", text="Weekly Wages of a Good Mechanic", anchor="center")
-wv <- wv + vm
+		pv.param(name="data", value="d"), 
+		pv.param(name="height", value=5),
+		pv.param(name="strokeStyle", value="#000"),
+		pv.param(name="left", data.name="start", scale="linear.start.x"),
+		pv.param(name="top", data.name="top"),
+		pv.param(name="width", data.name="reign"),
+		pv.param(name="fillStyle", data.name="fill")
+))
+vm <- vm + pv.mark(wv=wv, data=monarch2, type="Label", 
+		pv.param(name="font", value="italic 10px serif"), 
+		pv.param(name="text", data.name="name"), 
+		pv.param(name="textMargin", value=6), 
+		pv.param(name="textBaseline", value="top"), 
+		anchor="center")
+wv2 <- wv + vm
 
-render.webvis(wv=wv, vis.name="demo2")
+render.webvis(wv=wv2, vis.name="demo2")

@@ -4,7 +4,6 @@
 #
 # This is released under a BSD license.
 #
-#
 # Documentation was created using roxygen:
 # roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
 #
@@ -29,21 +28,6 @@ new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...
 	return(wv)
 }
 
-getTail <- function() {
-	t <- "</body></html>"
-	return(t)
-}
-
-getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
-	h <- paste("<html>
-  <head>
-    <title>", title, "</title>
-    <link type='text/css' rel='stylesheet' href='ex.css?3.1'/>
-    <script type='text/javascript' src='", protovis.path, "'></script>
-  </head>
-  <body>")
-	return(h)
-}
 
 webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.path=PROTOVIS.PATH) {
 	c(getHead(title=title, protovis.path=protovis.path), 
@@ -53,20 +37,12 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div></center>", getTail())
 }
 
-field.exists <- function(field, data) {
-	if(!missing(data)) if(is.data.frame(data)) { if(any(field %in% colnames(data))) return(TRUE) } else { stop("data should be a data.frame")}
-	FALSE
-}
-
-pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL, default=NULL) {
+pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL, default=NULL, quote=TRUE) {
 	if(missing(name)) stop("'name' is a required field for a webvis.param")
-	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, range.min=range.min, range.max=range.max, scale.min=scale.min, scale.max=scale.max)
+	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, range.min=range.min, range.max=range.max, scale.min=scale.min, scale.max=scale.max, quote=quote)
 	class(param) <- "webvis.param"
 	param
 }
-
-pv.param(data="a")
-pv.param(name="a")
 
 pv.scale <- function(type, width, height, data=NULL, data.name=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL) {
 	type <- unlist(strsplit(type, ".", fixed=TRUE))
@@ -85,7 +61,6 @@ pv.parse <- function(param, wv, data) {
 	if(!class(param) == "webvis.param") stop(paste("Function pv.parse expects a webvis.param input but received", class(param), "instead"))
 	if(!missing(data) && !field.exists("x", data)) 
 		data$x <- 1:length(data$y)
-	print(param$value)
 	if(!is.null(param$value)) if(param$value == "d") param$value <- data
 	if(is.null(param$data) && !missing(data)) param$data <- data
 	if(!is.null(param$data) && field.exists(field=param$data.name, data=param$data)) { 
@@ -93,7 +68,7 @@ pv.parse <- function(param, wv, data) {
 				if(!is.null(param$scale)) pv.scale(type=param$scale, width=wv$width, height=wv$height, data=param$data, range.min=param$range.min, range.max=param$range.max, scale.min=param$scale.min, scale.max=param$scale.max) else "", 
 					"(d.", param$data.name, ")", ")"))
 	} else if(!is.null(param$value)) {
-		return(collapse(".", param$name, "(", pv.data(param$value), ")")) 
+		return(collapse(".", param$name, "(", pv.data(param$value, quote=param$quote), ")")) 
 	}  
 	if(!is.null(param$default)) {
 		collapse(".", param$name, "(", pv.data(param$default), ")") 
@@ -115,13 +90,13 @@ pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
 	))
 	vis
 }
-pv.panel()
+#pv.panel()
 
 
 pv.dataset <- function(data, name) {
 	paste("var", name, "=", pv.data(data))
 }
-pv.dataset(data=wheat, name="wheat")
+#pv.dataset(data=wheat, name="wheat")
 
 
 #' Add a line to the visualization.
@@ -175,14 +150,14 @@ pv.mark <- function(wv, type, data, ..., anchor=NULL) {
 			anchor=anchor)
 	vis
 }
-pv.mark(wv=wv, type="Line", data=data.frame(y=1:5), 
-		pv.param(name="data", value=data), 
-		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
-
-pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
-
-plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
-plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
+#pv.mark(wv=wv, type="Line", data=data.frame(y=1:5), 
+#		pv.param(name="data", value=data), 
+#		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
+#
+#pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
+#
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
+#plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
 
 pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin=y.padding, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
@@ -203,10 +178,10 @@ pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, rig
 			anchor=anchor)
 	vis
 }
-
-pv.bar()
-
-plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
+#
+#pv.bar()
+#
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
 
 pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
@@ -226,8 +201,8 @@ pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, ri
 			anchor=anchor)
 	vis
 }
-
-plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
+#
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 
 pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE, anchor=NULL) {
 	vis <- list(type="pv.Wedge",
@@ -304,7 +279,7 @@ pv.label <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, r
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 # @examples
 #' 
-pv.data <- function(data) {
+pv.data <- function(data, quote=TRUE) {
 	if(is.character(data) && length(data)==1) return(collapse("'", data, "'"))
 	if(is.numeric(data) && length(data)==1) return(data)
 	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
@@ -421,15 +396,6 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 #' \url{http://vis.stanford.edu/protovis}
 #' @keywords package
 NULL
-
-collapse <- function(...) paste(c(...), collapse="")
-
-.onLoad <- function(lib, pkg="webvis") {
-	PROTOVIS.PATH <- as.character(Sys.getenv("PROTOVIS_PATH"))
-	if(PROTOVIS.PATH == "") PROTOVIS.PATH <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
-	OUTPUT.PATH <- as.character(Sys.getenv("WEBVIS_PATH"))
-	if(OUTPUT.PATH == "") OUTPUT.PATH <- tempdir()
-}
 
 #
 ##
