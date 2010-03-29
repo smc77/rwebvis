@@ -37,9 +37,11 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 }
 
 pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale=NA) {
-	if(!missing(data) && field.exists(field=field, data=data)) { 
-		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
-	} else if(!missing(value)) {
+	if(!missing(data) && !missing(field)) {
+		if(field.exists(field=field, data=data))
+			return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
+	} 
+	if(!missing(value)) {
 		return(paste(".", name, "(", pv.data(value), ")")) 
 	}  
 	if(!missing(default)) {
@@ -103,8 +105,6 @@ pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
 	vis
 }
 #pv.panel()
-
-
 
 #' Add a dataset as a variable to the visualization.
 #'
@@ -221,7 +221,7 @@ pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, rig
 #
 #pv.bar()
 #
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
 
 #
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
@@ -245,11 +245,17 @@ pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, ri
 	vis
 }
 
-
 #
-#wv <- new.webvis()
+# http://code.google.com/p/protovis-js/wiki/PvWedge
+#
+#wv <- new.webvis(width=150, height=150)
 #wv <- wv + pv.wedge(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
 #render.webvis(wv=wv)
+
+#wv <- new.webvis(width=150, height=150)
+#wv <- wv + pv.wedge(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)), inner.radius=50)
+#render.webvis(wv=wv)
+
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "pie")
 pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE, anchor=NULL) {
 	data$y <- (data$y/sum(data$y)) * 2 * pi
@@ -283,8 +289,6 @@ pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right
 }
 
 pv.rule <- function(wv, data, y.name, x.name, bottom, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
-	if(!missing(data) && !field.exists("x", data))
-		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Rule",
 			parameters=collapse(
 					pv.parameter("data", value=data),
@@ -297,15 +301,20 @@ pv.rule <- function(wv, data, y.name, x.name, bottom, height, left, right, bar.w
 			anchor=anchor)
 	vis
 }
+#
+#wv <- new.webvis(width=150, height=150)
+#pw <- new.webvis(root=pv.bar(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))) + pv.label(text="function(d) d.y")
+#wv <- wv + pw
+#render.webvis(wv=wv)
 
-pv.label <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, width, text, font, textAlign, textBaseline, textMargin, textAngle, text.style, anchor=NULL) {
+pv.label <- function(wv, data, y.name="y", x.name="x", bottom, height, left, right, width, text, font, textAlign, textBaseline, textMargin, textAngle, text.style, anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Label",
 			parameters=collapse(
 					pv.parameter("data", value=data),
-					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-					pv.parameter("height", data=data, field=y.name, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					#pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
+					pv.parameter("bottom", data=data, field=y.name, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
 					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
 					pv.parameter("text", value=text),
 					pv.parameter("font", value=font),
