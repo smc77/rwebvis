@@ -28,7 +28,6 @@ new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...
 	return(wv)
 }
 
-
 webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.path=PROTOVIS.PATH) {
 	c(getHead(title=title, protovis.path=protovis.path), 
 			paste("<center><div id='", div.id, "'>", sep=""), 
@@ -37,7 +36,7 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.pat
 		"</script></div></center>", getTail())
 }
 
-pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale="linear") {
+pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale=NA) {
 	if(!missing(data) && field.exists(field=field, data=data)) { 
 		return(collapse(".", name, "(function(d) ", if(!is.na(scale)) collapse("pv.Scale.", scale, "(", if(missing(scale.min)) min(data[,field]) else scale.min, ", ", if(missing(scale.max)) max(data[,field]) else scale.max, ").range(", range.min, ",", range.max, ")") else "", "(d.", field, ")", ")"))
 	} else if(!missing(value)) {
@@ -124,6 +123,40 @@ pv.dataset <- function(data, name) {
 	paste("var", name, "=", pv.data(data))
 }
 
+#' Generic function for all Protovis mark types.
+#'
+#' \code{pv.mark} Generic function for all Protovis mark types.
+#'
+#' @param wv A webvis object
+#' @param type Can be "Line", "Bar", etc. (see Protovis API)
+#' @param data A dataset for plotting.
+#' @param ... Any number of pv.param objects.
+#' @param anchor If anchoring to another object.
+#' @return A webvis object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' pv.mark(wv=new.webvis(), type="Line", data=data.frame(y=1:5), 
+#' 		pv.param(name="data", value=data), 
+#' 		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
+pv.mark <- function(wv, type, data, ..., anchor=NULL) {
+	vis <- list(type=collapse("pv.", type),
+			parameters=collapse(
+					unlist(lapply(list(...), function(x, data, wv) {
+										if(!is.null(x$data) && is.null(x$data.name)) pv.parse(x, wv=wv) else pv.parse(x, wv=wv, data=data)
+									}, data=data, wv=wv)),";"),
+			anchor=anchor)
+	vis
+}
+
+#
+#pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
+#
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
+#plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
+
 #' Add a line to the visualization.
 #'
 #' \code{pv.line} Adds a line plot to the visualization
@@ -166,24 +199,6 @@ pv.line <- function(wv, data, bottom, bottom.name, bottom.scale, top, top.name, 
 	vis
 }
 
-pv.mark <- function(wv, type, data, ..., anchor=NULL) {
-	vis <- list(type=collapse("pv.", type),
-			parameters=collapse(
-					unlist(lapply(list(...), function(x, data, wv) {
-						if(!is.null(x$data) && is.null(x$data.name)) pv.parse(x, wv=wv) else pv.parse(x, wv=wv, data=data)
-					}, data=data, wv=wv)),";"),
-			anchor=anchor)
-	vis
-}
-#pv.mark(wv=wv, type="Line", data=data.frame(y=1:5), 
-#		pv.param(name="data", value=data), 
-#		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
-#
-#pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
-#
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
-#plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
-
 pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin=y.padding, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
@@ -208,6 +223,9 @@ pv.bar <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, rig
 #
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
 
+#
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
+
 pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
@@ -226,22 +244,29 @@ pv.area <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, ri
 			anchor=anchor)
 	vis
 }
-#
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 
+
+#
+#wv <- new.webvis()
+#wv <- wv + pv.wedge(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
+#render.webvis(wv=wv)
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "pie")
 pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE, anchor=NULL) {
+	data$y <- (data$y/sum(data$y)) * 2 * pi
 	vis <- list(type="pv.Wedge",
-			parameters=paste(if(!missing(data)) paste(".data(pv.normalize(", pv.data(data), "))") else "",
-			if(!missing(bottom)) paste(".bottom(", bottom, ")") else paste(".bottom(", wv$height/2, ")"),
-			if(!missing(left)) paste(".left(", left, ")") else paste(".left(", wv$width/2, ")"),
-			if(!missing(inner.radius)) paste(".innerRadius(", inner.radius, ")") else "",
-			if(!missing(outer.radius)) paste(".outerRadius(", outer.radius, ")") else paste(".outerRadius(", min(wv$width,wv$height)/2, ")"),
-			if(!missing(fill.style)) paste(".fillStyle(", fill.style, ")") else "", 
-			if(!missing(angle)) paste(".angle(", angle, ")", sep="") else ".angle(function(d) d * 2 * Math.PI)",
-			";", sep=""),
-	anchor=anchor)
+			parameters=collapse(
+					pv.parameter("data", value=data),
+					pv.parameter("bottom", value=bottom, default=wv$height/2),
+					pv.parameter("left", value=left, default=wv$width/2),
+					pv.parameter("innerRadius", value=inner.radius),
+					pv.parameter("outerRadius", value=outer.radius, default=min(wv$width,wv$height)/2),
+					pv.parameter("fillStyle", value=fill.style),
+					pv.parameter("angle", value=angle, data=data, field="y"),
+					";"),
+			anchor=anchor)
 	vis
 }
+
 
 pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, size, shape, stroke.style, fill.style) {
 	multiplier <- (wv$height / max(data)) - 5
@@ -257,14 +282,14 @@ pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right
 	vis
 }
 
-pv.rule <- function(wv, data, y.name="y", x.name="x", bottom, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
+pv.rule <- function(wv, data, y.name, x.name, bottom, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
 	if(!missing(data) && !field.exists("x", data))
 		data$x <- 1:length(data$y)
 	vis <- list(type="pv.Rule",
 			parameters=collapse(
 					pv.parameter("data", value=data),
 					pv.parameter("bottom", data=data, field=y.name, scale.min=ymin, scale.max=ymax, value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-					#pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
+					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
 					pv.parameter("strokeStyle", value=stroke.style),
 					pv.parameter("fillStyle", value=fill.style),
 					pv.parameter("interpolate", value=interpolate),
@@ -305,7 +330,7 @@ pv.label <- function(wv, data, y.name="y", x.name="x", bottom=0, height, left, r
 # @examples
 #' 
 pv.data <- function(data, quote=TRUE) {
-	if(is.character(data) && length(data)==1) return(collapse("'", data, "'"))
+	if(is.character(data) && length(data)==1) if(quote) return(collapse("'", data, "'")) else data
 	if(is.numeric(data) && length(data)==1) return(data)
 	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
 	if(is.vector(data)) {
@@ -394,8 +419,10 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	} else if(type=="area") {
 		wv + pv.area(wv, data=data, ...)
 	}
-	wv <- wv + pv.rule(wv, bottom=0)
-	wv <- wv + pv.rule(wv, left=0)
+	if(type!="pie") {
+		wv <- wv + pv.rule(wv, bottom=0)
+		wv <- wv + pv.rule(wv, left=0)
+	}
 	render.webvis(wv)
 }
 
@@ -422,6 +449,7 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 #' @keywords package
 NULL
 
+
 #
 ##
 #wv <- new.webvis()
@@ -436,9 +464,8 @@ NULL
 #wv <- wv + pv.rule(wv, left=0)
 #render.webvis(wv=wv)
 
-
-
-#
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "pie")
+
+#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")

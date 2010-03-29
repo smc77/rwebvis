@@ -10,6 +10,16 @@
 ###############################################################################
 
 
+#' A simplied version of paste.
+#'
+#' \code{collapse} A simplied version of paste. 
+#'
+#' @param ... Comma separated list of values.
+#' @return A string of the values combined.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @examples
+#' collapse("a", "b", "c")
 collapse <- function(...) paste(c(...), collapse="")
 
 getTail <- function() {
