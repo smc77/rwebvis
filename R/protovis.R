@@ -9,6 +9,7 @@
 #
 ###############################################################################
 
+
 `+.webvis` <- function (parent, child) {
 	# check that the parent is a "webvis" object; if not, use normal + operation
 	i <- length(parent$branch)
@@ -16,26 +17,84 @@
 	parent
 }
 
-new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset=NULL, ...) {
-	wv <- list(name="vis",
-		description=NULL, 
+#' Create a new webvis object to store each layer of the visualization.
+#'
+#' \code{new.webvis} Create a new webvis object to store each layer of the visualization.
+#'
+#' @param root The root node of the visualization.
+#' @param branch A node layer underneath the root visualization.
+#' @param width  The width in pixels.
+#' @param height The height in pixels.
+#' @param name The name of the visualization.
+#' @param description A description of the visualization.
+#' @param dataset A dataset associated with the visualization.
+#' @return A webvis objectt.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' new.webvis()
+new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset=NULL, branch=list(), ...) {
+	wv <- list(name=name,
+		description=description, 
 		width=width,
 		height=height,
 		data=dataset,
 		root=root,
-		branch=list())
+		branch=branch)
     class(wv) <- "webvis"
 	return(wv)
 }
 
-webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title="", protovis.path=PROTOVIS.PATH) {
-	c(getHead(title=title, protovis.path=protovis.path), 
-			paste("<center><div id='", div.id, "'>", sep=""), 
+is.webvis <- function(x) class(x) == "webvis"
+
+#' Convert webvis to HTML.
+#'
+#' \code{webvisToHTML} Convert webvis to HTML.
+#'
+#' @param wv A webvis object.
+#' @param div.id The div tag id.
+#' @param html.wrap Whether to wrap the visualization in other supplied HTML.
+#' @param title The title of the HTML page.
+#' @param head The HTML above the webvis.
+#' @param tail The HTML below the webvis.
+#' @param protovis.path The path to the protovis javascript.
+#' @return The HTML output
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' webvisToHTML(new.webvis())
+webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=webvis$name, head=getHead(title=title, protovis.path=protovis.path), tail=getTail(), protovis.path=PROTOVIS.PATH) {
+	if(!is.webvis(wv)) stop("webvisToHTML requires a webvis object")
+	wv.html <- c(paste("<center><div id='", div.id, "'>", sep=""), 
 		"<script type='text/javascript+protovis'>",
 		as.character(wv),
-		"</script></div></center>", getTail())
+		"</script></div></center>")
+	if(html.wrap) wv.html <- c(head, wv.html, tail)
+	wv.html
 }
 
+#' A protovis node parameter.
+#'
+#' \code{pv.parameter} A protovis node parameter.
+#'
+#' @param name The name of the protovis node type (any mark, including "Line", "Area", "Wedge", etc.).
+#' @param div.id The div tag id.
+#' @param html.wrap Whether to wrap the visualization in other supplied HTML.
+#' @param title The title of the HTML page.
+#' @param head The HTML above the webvis.
+#' @param tail The HTML below the webvis.
+#' @param protovis.path The path to the protovis javascript.
+#' @return The HTML output
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
 pv.parameter <- function(name, default, data, field, value, range.min, range.max, scale.min, scale.max, scale=NA) {
 	if(!missing(data) && !missing(field)) {
 		if(field.exists(field=field, data=data))
@@ -51,6 +110,28 @@ pv.parameter <- function(name, default, data, field, value, range.min, range.max
 	}
 }
 
+#' A protovis mark parameter.
+#'
+#' \code{pv.parameter} A protovis mark parameter.
+#'
+#' @param name The name of mark parameter.
+#' @param data The data used in the parameter settings.
+#' @param data.name The name of the field in the dataset.
+#' @param value An explicit value for the parameter.
+#' @param scale Whether the value or data should be scaled.  Can be "linear", "log", or ...
+#' @param range.min The minimum value for the range (or defaults to the minimum from the data).
+#' @param range.max The maximum value for the range (or defaults to the maximum from the data.
+#' @param scale.min The minimum scaled value (or defaults to zero) in pixels.
+#' @param scale.max The maximum scaled value (or defaults to the height/width of the visualization) in pixels.
+#' @param default The default value for the parameter.
+#' @param quote Whether character values should be quoted.
+#' @return A webvis.param object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' pv.param(name="data", value="d")
 pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL, default=NULL, quote=TRUE) {
 	if(missing(name)) stop("'name' is a required field for a webvis.param")
 	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, range.min=range.min, range.max=range.max, scale.min=scale.min, scale.max=scale.max, quote=quote)
@@ -58,6 +139,24 @@ pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, ra
 	param
 }
 
+#' A protovis node parameter.
+#'
+#' \code{pv.scale} A protovis node parameter.
+#'
+#' @param name The name of the protovis node type (any mark, including "Line", "Area", "Wedge", etc.).
+#' @param div.id The div tag id.
+#' @param html.wrap Whether to wrap the visualization in other supplied HTML.
+#' @param title The title of the HTML page.
+#' @param head The HTML above the webvis.
+#' @param tail The HTML below the webvis.
+#' @param protovis.path The path to the protovis javascript.
+#' @return The HTML output
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @examples
+#' pv.param(name="data", value="d")
 pv.scale <- function(type, width, height, data=NULL, data.name=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL) {
 	type <- unlist(strsplit(type, ".", fixed=TRUE))
 	if(length(type) != 3) stop("scale type must be of format type.datarange.scale.range (e.g. linear.y.y)")
@@ -152,7 +251,6 @@ pv.mark <- function(wv, type, data, ..., anchor=NULL) {
 }
 
 #
-#pv.parameter("lineWidth", data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), field="width", scale=NA)
 #
 #plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
 #plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
@@ -467,7 +565,7 @@ NULL
 #
 #wv <- new.webvis()
 #line <- new.webvis(root=pv.line(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2))))
-#line <- line + pv.label(line, text.style="white", anchor="top") 
+##line <- line + pv.label(line, text.style="white", anchor="top") 
 #wv <- wv + line
 #wv <- wv + pv.rule(wv, bottom=0)
 #wv <- wv + pv.rule(wv, left=0)
