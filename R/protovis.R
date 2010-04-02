@@ -139,24 +139,26 @@ pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, ra
 	param
 }
 
-#' A protovis node parameter.
+#' A scaling function for protovis.
 #'
-#' \code{pv.scale} A protovis node parameter.
+#' \code{pv.scale} A scaling function for protovis.
 #'
-#' @param name The name of the protovis node type (any mark, including "Line", "Area", "Wedge", etc.).
-#' @param div.id The div tag id.
-#' @param html.wrap Whether to wrap the visualization in other supplied HTML.
-#' @param title The title of the HTML page.
-#' @param head The HTML above the webvis.
-#' @param tail The HTML below the webvis.
-#' @param protovis.path The path to the protovis javascript.
+#' @param type The type is a "." separated string which determines whether the scaling is linear, log, or ..., and what parameter should be scaled.
+#' @param width The width of the panel.
+#' @param height The height of the panel.
+#' @param data The data for the panel.
+#' @param data.name The name of the variable to be scaled.
+#' @param range.min The minimum value for the data to scale.
+#' @param range.max The maximum value for the data to scale.
+#' @param scale.min The minimum scaled value.
+#' @param scale.max The maximum scaled value.
 #' @return The HTML output
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' pv.param(name="data", value="d")
+#' pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)))
 pv.scale <- function(type, width, height, data=NULL, data.name=NULL, range.min=NULL, range.max=NULL, scale.min=NULL, scale.max=NULL) {
 	type <- unlist(strsplit(type, ".", fixed=TRUE))
 	if(length(type) != 3) stop("scale type must be of format type.datarange.scale.range (e.g. linear.y.y)")
@@ -170,6 +172,18 @@ pv.scale <- function(type, width, height, data=NULL, data.name=NULL, range.min=N
 			").range(", range.min, ",", range.max, ")")
 }
 
+#' Takes a parameter and a webvis object and parses them.
+#'
+#' \code{pv.parse} Takes a parameter and a webvis object and parses them.
+#'
+#' @param param A webvis param object from pv.param().
+#' @param wv A webvis object.
+#' @param data A dataset.
+#' @return The HTML output
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
 pv.parse <- function(param, wv, data) {
 	if(!class(param) == "webvis.param") stop(paste("Function pv.parse expects a webvis.param input but received", class(param), "instead"))
 	if(!missing(data) && !field.exists("x", data)) 
@@ -190,6 +204,18 @@ pv.parse <- function(param, wv, data) {
 	}
 }
 
+#' A protovis panal.
+#'
+#' \code{pv.panel} A protovis panal.
+#'
+#' @param param A webvis param object from pv.param().
+#' @param wv A webvis object.
+#' @param data A dataset.
+#' @return The HTML output
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
 pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
 	vis <- list(type="pv.Panel",
 			parameters=collapse(
