@@ -100,12 +100,13 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHe
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
 #' pv.param(name="data", value="d")
-pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, scale.min=NULL, scale.max=NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, default=NULL, quote=TRUE, ...) {
+pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, scale.min=NULL, scale.max=NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, default=NULL, quote=TRUE) {
 	if(missing(name)) stop("'name' is a required field for a webvis.param")
 	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, scale.min=scale.min, scale.max=scale.max, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, quote=quote)
 	class(param) <- "webvis.param"
 	param
 }
+
 pv.area(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", ymin=10, bottom=0, render=TRUE)
 
 #' A scaling function for protovis.
@@ -127,7 +128,7 @@ pv.area(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", he
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)))
+#' pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)
 pv.scale <- function(type, width, height, data=NULL, data.name=NULL, scale.min=NULL, scale.max=NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL) {
 	type <- unlist(strsplit(type, ".", fixed=TRUE))
 	if(length(type) != 3) stop("scale type must be of format type.datarange.scale.range (e.g. linear.y.y)")
@@ -164,7 +165,7 @@ pv.parse <- function(param, wv, data) {
 	if(is.null(param$data) && esse(data)) param$data <- data
 	if(!is.null(param$data) && field.exists(field=param$data.name, data=param$data)) { 
 		return(collapse(".", param$name, "(function(d) ", 
-				if(!is.null(param$scale)) pv.scale(type=param$scale, width=wv$width, height=wv$height, data=param$data, scale.min=param$range.min, scale.max=param$range.max, xmin=param$xmin, xmax=param$xmax, ymin=param$ymin, ymax=param$ymax) else "", 
+				if(!is.null(param$scale)) pv.scale(type=param$scale, width=wv$width, height=wv$height, data=param$data, scale.min=param$scale.min, scale.max=param$scale.max, xmin=param$xmin, xmax=param$xmax, ymin=param$ymin, ymax=param$ymax) else "", 
 					"(d.", param$data.name, ")", ")"))
 	} else if(!is.null(param$data.name)) {
 		return(collapse(".", param$name, "(function(d) ", 
@@ -244,7 +245,6 @@ pv.dataset <- function(data, name) {
 pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))
 pv.parse(pv.param(name="text", data.name="y"), data=data.frame(y=1:5))
 pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
-	# need to allow for no parameters and just return the type
 	args <- if(length(list(...)) > 0) { if(is.webvis.param(list(...)[[1]])) list(...) else list(...)[[1]] } else list()
 	vis <- list(type=collapse("pv.", type),
 			parameters=collapse(
@@ -256,11 +256,11 @@ pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
 	vis
 }
 
-append.param <- function(paramlist, name, value, param.name, param.scale, xmin, xmax, ymin, ymax) {
+append.param <- function(paramlist, name, value, param.name, param.scale, scale.min=NULL, scale.max=NULL, xmin, xmax, ymin, ymax) {
 	if(esse(value)) {
 		paramlist[[length(paramlist) + 1]] <- pv.param(name=name, value=if(name=="data") "d" else value) 
 	} else if(esse(param.name)) {
-		paramlist[[length(paramlist) + 1]] <- pv.param(name=name, data.name=param.name, scale=if(esse(param.scale)) param.scale else NULL, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+		paramlist[[length(paramlist) + 1]] <- pv.param(name=name, data.name=param.name, scale=(if(esse(param.scale)) param.scale else NULL), scale.min=scale.min, scale.max=scale.max, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 	}
 	paramlist
 }
@@ -294,7 +294,7 @@ append.param <- function(paramlist, name, value, param.name, param.scale, xmin, 
 		size, size.name, size.scale, shape, shape.name, shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, 
 		angle, angle.name, angle.scale, start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, 
 		text, text.name, text.scale, font, text.style, text.align, text.baseline, text.margin, text.angle,  
-		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, anchor=NULL, render=FALSE, normalize=FALSE, ...) {
+		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, scale.min=NULL, scale.max=NULL, anchor=NULL, render=FALSE, normalize=FALSE, ...) {
 	if(!esse(wv)) { wv <- new.webvis() }
 	if(esse(data)) {
 		if(is.vector(data))
@@ -307,12 +307,12 @@ append.param <- function(paramlist, name, value, param.name, param.scale, xmin, 
 	# build the final parameter list
 	paramlist <- list()
 	paramlist <- append.param(paramlist=paramlist, name="data", value=data)
-	paramlist <- append.param(paramlist=paramlist, name="bottom", value=bottom, param.name=bottom.name, param.scale=bottom.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+	paramlist <- append.param(paramlist=paramlist, name="bottom", value=bottom, param.name=bottom.name, param.scale=bottom.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, scale.min=scale.min, scale.max=scale.max)
 	paramlist <- append.param(paramlist=paramlist, name="top", value=top, param.name=top.name, param.scale=top.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 	paramlist <- append.param(paramlist=paramlist, name="right", value=right, param.name=right.name, param.scale=right.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 	paramlist <- append.param(paramlist=paramlist, name="left", value=left, param.name=left.name, param.scale=left.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
-	paramlist <- append.param(paramlist=paramlist, name="height", value=height, param.name=height.name, param.scale=height.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
-	paramlist <- append.param(paramlist=paramlist, name="lineWidth", value=line.width, param.name=line.width.name, param.scale=line.width.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+	paramlist <- append.param(paramlist=paramlist, name="height", value=height, param.name=height.name, param.scale=height.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, scale.min=scale.min, scale.max=scale.max)
+	paramlist <- append.param(paramlist=paramlist, name="lineWidth", value=line.width, param.name=line.width.name, param.scale=line.width.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, scale.max=scale.max)
 	paramlist <- append.param(paramlist=paramlist, name="width", value=width, param.name=width.name, param.scale=width.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 	paramlist <- append.param(paramlist=paramlist, name="strokeStyle", value=stroke.style, param.name=stroke.style.name, param.scale=stroke.style.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 	paramlist <- append.param(paramlist=paramlist, name="fillStyle", value=fill.style, param.name=fill.style.name, param.scale=fill.style.scale, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
@@ -337,189 +337,6 @@ append.param <- function(paramlist, name, value, param.name, param.scale, xmin, 
 	if(render) render.webvis(wv=(wv + vis)) else vis
 }
 
-#pv.line()
-#pv.line(anchor="top")	
-#pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=TRUE)
-
-# line example 1
-pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
-pv.line(data=data.frame(z=c(1, 1.2, 1.7, 1.5, .7, .5, .2)), bottom.name="z", render=TRUE)
-pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", render=TRUE)
-
-# line example 1 (using layers)
-wv <- new.webvis(width=150, height=150)
-render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x"))
-
-# line example 2 (need to make sure that it doesn't go over the edge
-wv <- new.webvis(width=150, height=150)
-wv <- wv + (new.webvis(wv=wv, root=pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x"))
-			+ pv.dot())
-render.webvis(wv)
-
-# line example 4
-wv <- new.webvis(width=150, height=150)
-render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", left.name="x", top.scale="linear.y.y", left.scale="linear.x.x"))
-
-# line example 5
-wv <- new.webvis(width=150, height=150)
-render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
-
-# line example 7
-wv <- new.webvis(width=150, height=150)
-render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", interpolate="step-after"))
-
-pv.line <- function(bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", ...) {
-	vis <- .pv.chart(type="Line", bottom.name=bottom.name, left.name=left.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
-	vis
-}
-
-#' Add a bar to the visualization.
-#'
-#' \code{pv.bar} Adds a line plot to the visualization
-#'
-#' @param ... The parameters from .pv.chart 
-#' @return A wv object.
-#' @keywords graphics
-#' @author Shane Conway \email{shane.conway@@gmail.com}
-#' @references
-#' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{.pv.chart}} that creates the webvis object.
-#' @examples
-#' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar")
-#' pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=25, render=TRUE)
-pv.bar <- function(height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=NULL, xmax=NULL, ...) {
-	args <- list(...)
-	print(names(args))
-	panel.width <- args[names(args)=="wv"]$wv$width
-	n <- args[names(args)=="data"]$data
-	if(is.null(width) && is.data.frame(n)) width <- (panel.width/nrow(n))/1.2
-	if(is.null(xmax)) xmax <- panel.width - width
-	vis <- .pv.chart(type="Bar", height.name=height.name, left.name=left.name, height.scale=height.scale, left.scale=left.scale, bottom=bottom, width=width, xmax=xmax, ...)
-	vis
-}
-
-#pv.area(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", ymin=10, ymax=100, bottom=0, render=TRUE)
-pv.area <- function(...) {
-	vis <- .pv.chart(type="Area", ...)
-	vis
-}
-
-
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), left=75, bottom=75, outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), left=150, bottom=75, inner.radius=50, outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2), rad=20*(1:7)), left=75, bottom=75, inner.radius=50, outer.radius.name="rad", angle.name="y", render=TRUE)
-pv.wedge <- function(...) {
-	vis <- .pv.chart(type="Wedge", ..., normalize=TRUE)
-	vis
-}
-
-pv.dot <- function(...) {
-	vis <- .pv.chart(type="Dot", ...)
-	vis
-}
-
-pv.shape <- function(...) {
-	vis <- .pv.chart(type="Shape", ...)
-	vis
-}
-
-pv.image <- function(...) {
-	vis <- .pv.chart(type="Image", ...)
-	vis
-}
-
-pv.rule <- function(...) {
-	vis <- .pv.chart(type="Rule", ...)
-	vis
-}
-
-pv.label <- function(...) {
-	vis <- .pv.chart(type="Label", ...)
-	vis
-}
-
-
-
-#
-# http://code.google.com/p/protovis-js/wiki/PvWedge
-#
-#wv <- new.webvis(width=150, height=150)
-#wv <- wv + pv.wedge(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
-#render.webvis(wv=wv)
-
-#wv <- new.webvis(width=150, height=150)
-#wv <- wv + pv.wedge(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)), inner.radius=50)
-#render.webvis(wv=wv)
-
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "pie")
-#pv.wedge <- function(wv, data, bottom, left, right, inner.radius, outer.radius, fill.style, angle, equal.spacing=TRUE, anchor=NULL) {
-#	data$y <- (data$y/sum(data$y)) * 2 * pi
-#	vis <- list(type="pv.Wedge",
-#			parameters=collapse(
-#					pv.parameter("data", value=data),
-#					pv.parameter("bottom", value=bottom, default=wv$height/2),
-#					pv.parameter("left", value=left, default=wv$width/2),
-#					pv.parameter("innerRadius", value=inner.radius),
-#					pv.parameter("outerRadius", value=outer.radius, default=min(wv$width,wv$height)/2),
-#					pv.parameter("fillStyle", value=fill.style),
-#					pv.parameter("angle", value=angle, data=data, field="y"),
-#					";"),
-#			anchor=anchor)
-#	vis
-#}
-#
-#
-#pv.dot <- function(wv, data, bottom=(wv$height/2), top, left=(wv$width/2), right, size, shape, stroke.style, fill.style) {
-#	multiplier <- (wv$height / max(data)) - 5
-#	interval <- ((wv$width-30) / length(data))
-#	vis <- list(type="pv.Dot",
-#			parameters=paste(if(!missing(data) || length(data)) paste(".data(", pv.data(data), ")") else "",
-#			if(!missing(bottom) || length(bottom)) paste(".bottom(function(d) d * ", multiplier, ")"),
-#			if(!missing(left) || length(left)) paste(".left(function() this.index * ", interval, " + 15)"),
-#			if(!missing(size)) paste(".size(function() this.index * ", interval, " + 15)") else "",
-#			if(!missing(shape)) paste(".shape(", shape, "") else "",
-#			";", sep=""),
-#	anchor=anchor)
-#	vis
-#}
-#
-#pv.rule <- function(wv, data, y.name, x.name, bottom, height, left, right, bar.width, line.width, stroke.style, segmented=(!missing(line.width) || field.exists(field="width", data=data)), interpolate, fill.style, x.padding=(wv$width)/50, y.padding=(wv$height)/50, xmin, xmax, ymin, ymax, scale="linear", anchor=NULL) {
-#	vis <- list(type="pv.Rule",
-#			parameters=collapse(
-#					pv.parameter("data", value=data),
-#					pv.parameter("bottom", data=data, field=y.name, scale.min=ymin, scale.max=ymax, value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-#					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
-#					pv.parameter("strokeStyle", value=stroke.style),
-#					pv.parameter("fillStyle", value=fill.style),
-#					pv.parameter("interpolate", value=interpolate),
-#					";"),
-#			anchor=anchor)
-#	vis
-#}
-##
-##wv <- new.webvis(width=150, height=150)
-##pw <- new.webvis(root=pv.bar(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))) + pv.label(text="function(d) d.y")
-##wv <- wv + pw
-##render.webvis(wv=wv)
-#
-#pv.label <- function(wv, data, y.name="y", x.name="x", bottom, height, left, right, width, text, font, textAlign, textBaseline, textMargin, textAngle, text.style, anchor=NULL) {
-#	if(!missing(data) && !field.exists("x", data))
-#		data$x <- 1:length(data$y)
-#	vis <- list(type="pv.Label",
-#			parameters=collapse(
-#					pv.parameter("data", value=data),
-#					pv.parameter("bottom", data=data, field="bottom", value=bottom, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-#					#pv.parameter("bottom", data=data, field=y.name, scale.min=ymin, scale.max=ymax, range.min=y.padding, range.max=wv$height-y.padding, scale=scale),
-#					pv.parameter("left", data=data, field=x.name, scale.min=xmin, scale.max=xmax, value=left, range.min=x.padding, range.max=wv$width-x.padding, scale=scale),
-#					pv.parameter("text", value=text),
-#					pv.parameter("font", value=font),
-#					pv.parameter("text.style", value=text.style),
-#					";"),
-#			anchor=anchor)
-#	vis
-#}
-
-
 #' Add a panel to the visualization.
 #'
 #' \code{protovis.data} Adds a panel to the visualization
@@ -534,6 +351,7 @@ pv.label <- function(...) {
 # @examples
 #' 
 pv.data <- function(data, quote=FALSE) {
+	if(data == "null") return(data)
 	if(is.character(data) && length(data)==1) if(quote) return(collapse("'", data, "'")) else data
 	if(is.numeric(data) && length(data)==1) return(data)
 	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
@@ -634,7 +452,8 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	}
 	render.webvis(wv)
 }
-plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
+# plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
+# plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", scale.min=0)
 
 #' Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.
 #'
@@ -688,15 +507,15 @@ NULL
 
 #
 #render.webvis(new.webvis() + (new.webvis(root=pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=30))+ pv.label(data=1:7, text.name="y", anchor="top", text.style="white")))
-
-wv <- new.webvis(root=pv.panel(width=150, height=150), width=150, height=150)
-render.webvis((wv + 
-		(new.webvis(wv=wv, root=pv.bar(wv=wv, data=c(1, 1.2, 1.5, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=10, width=20, ymin=0, ymax=140))
-			+ pv.label(wv=wv, data=1:7, text.name="y", anchor="top", text.style="white")))
-	+ (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:4, bottom.name="y", bottom.scale="linear.y.y", ymin=10)))# + pv.label(data=data, text="d"))
-	+ pv.rule(wv=wv, left=0, bottom=0)
-)
-remove(wv)
+#
+#wv <- new.webvis(root=pv.panel(width=150, height=150), width=150, height=150)
+#render.webvis((wv + 
+#		(new.webvis(wv=wv, root=pv.bar(wv=wv, data=c(1, 1.2, 1.5, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=10, width=20, ymin=0, ymax=140))
+#			+ pv.label(wv=wv, data=1:7, text.name="y", anchor="top", text.style="white")))
+#	+ (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:4, bottom.name="y", bottom.scale="linear.y.y", ymin=10)))# + pv.label(data=data, text="d"))
+#	+ pv.rule(wv=wv, left=0, bottom=0)
+#)
+#remove(wv)
 
 
 
