@@ -102,12 +102,11 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHe
 #' pv.param(name="data", value="d")
 pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, scale.min=NULL, scale.max=NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, default=NULL, quote=TRUE) {
 	if(missing(name)) stop("'name' is a required field for a webvis.param")
+	if(!esse(data.name) && !esse(value)) return()
 	param <- list(name=name, data=data, data.name=data.name, value=value, scale=scale, scale.min=scale.min, scale.max=scale.max, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, quote=quote)
 	class(param) <- "webvis.param"
 	param
 }
-
-pv.area(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", ymin=10, bottom=0, render=TRUE)
 
 #' A scaling function for protovis.
 #'
@@ -192,21 +191,21 @@ pv.parse <- function(param, wv, data) {
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-pv.panel <- function(data, width=300, height=200, left, right, bottom, top) {
-	vis <- list(type="pv.Panel",
-			parameters=collapse(
-				pv.parameter("data", value=data),
-				pv.parameter("width", value=width),
-				pv.parameter("height", value=height),
-				pv.parameter("left", value=left),
-				pv.parameter("right", value=right),
-				pv.parameter("bottom", value=bottom),
-				pv.parameter("top", value=top)
-	))
+pv.panel <- function(wv, data, width=300, height=200, left, right, bottom, top) {
+	params <- list((if(esse(data)) pv.param(name="data", value="d") else NULL), 
+		pv.param(name="width", value=width),
+		pv.param(name="height", value=height),
+		pv.param(name="left", value=left),
+		pv.param(name="right", value=right),
+		pv.param(name="bottom", value=bottom),
+		pv.param(name="top", value=top))
+	missing.param <- (unlist(lapply(params, is.null)))
+	params <- params[which(!missing.param)]
+	vis <- pv.mark(wv=wv, data=data, type="Panel", params)
 	vis
 }
 #pv.panel()
-
+#pv.panel(right=60, top=20, bottom=20, width=800, height=445)
 #' Add a dataset as a variable to the visualization.
 #'
 #' \code{pv.dataset} Add a dataset as a variable to the visualization.
@@ -242,9 +241,10 @@ pv.dataset <- function(data, name) {
 #' pv.mark(wv=new.webvis(), type="Line", data=data.frame(y=1:5), 
 #' 		pv.param(name="data", value=data), 
 #' 		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
-pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))
-pv.parse(pv.param(name="text", data.name="y"), data=data.frame(y=1:5))
+#' pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))
+#' pv.parse(pv.param(name="text", data.name="y"), data=data.frame(y=1:5))
 pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
+	if(!esse(data)) data <- NULL
 	args <- if(length(list(...)) > 0) { if(is.webvis.param(list(...)[[1]])) list(...) else list(...)[[1]] } else list()
 	vis <- list(type=collapse("pv.", type),
 			parameters=collapse(
@@ -334,6 +334,7 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 	paramlist <- append.param(paramlist=paramlist, name="textAngle", value=text.angle)
 	# assemble the mark
 	vis <- pv.mark(wv=wv, data=data, type=type, paramlist, anchor=anchor)
+	#vis <- new.webvis(root=vis)
 	if(render) render.webvis(wv=(wv + vis)) else vis
 }
 

@@ -9,4 +9,4 @@ Description: Create SVG graphics for the web from R.  Currently provides basic f
 License: BSD
 LazyLoad: no
 URL: http://code.google.com/p/rwebvis/
-Collate: 'protovis.R' 'util.R' 'zzz.R'
+Collate: 'protovis.R' 'protovis.marks.R' 'util.R' 'zzz.R'

@@ -10,7 +10,7 @@
 #pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=TRUE)
 
 # line example 1
-pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
+pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=FALSE)
 pv.line(data=data.frame(z=c(1, 1.2, 1.7, 1.5, .7, .5, .2)), bottom.name="z", render=TRUE)
 pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale=NULL, left.scale="linear.x.x", render=TRUE)
 
@@ -158,17 +158,28 @@ pv.image <- function(...) {
 	vis
 }
 
-pv.rule <- function(...) {
-	vis <- .pv.chart(type="Rule", ...)
+pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom.name, bottom.scale, stroke.style="rgba(128,128,128,.2)", ...) {
+	if(axis=="x" && !esse(left) && !esse(left.name)) {
+		left.name <- "x"
+		left.scale <- "linear.x.x"
+	} else if(axis=="y" && !esse(bottom) && !esse(bottom.name)) {
+		bottom.name <- "y"
+		bottom.scale <- "linear.y.y"
+	} 
+	vis <- .pv.chart(type="Rule", data=data, left=left, left.name=left.name, left.scale=left.scale, bottom=bottom, bottom.name=bottom.name, bottom.scale=bottom.scale, stroke.style=stroke.style, ...)
 	vis
 }
 
-pv.label <- function(...) {
-	vis <- .pv.chart(type="Label", ...)
+pv.label <- function(text, text.name, ...) {
+	vis <- .pv.chart(type="Label", text=text, text.name=text.name, ...)
 	vis
 }
 
-
+wv <- new.webvis(root=pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20))
+wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="y")) + pv.label(anchor="right", text.name="y"))
+wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="x")) + pv.label(anchor="bottom", text.name="x"))
+wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
+render.webvis(wv)
 
 #
 # http://code.google.com/p/protovis-js/wiki/PvWedge
