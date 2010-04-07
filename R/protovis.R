@@ -492,12 +492,18 @@ pv.data <- function(data, quote=FALSE) {
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-render.webvis <- function(wv, vis.name=NULL, file.name=if(!is.null(OUTPUT.PATH)) collapse(OUTPUT.PATH, vis.name, ".html") else collapse(tempfile(), ".html"), title="", protovis.path=PROTOVIS.PATH) {
+render.webvis <- function(wv, vis.name=NULL, file.name, title="", protovis.path) {
+	file.name <- if(exists("OUTPUT.PATH")) {
+			if(!is.null(OUTPUT.PATH)) collapse(OUTPUT.PATH, vis.name, ".html") 
+		} else { collapse(tempfile(), ".html") }
+	if(!exists("PROTOVIS.PATH"))
+		protovis.path <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
 	con=file(file.name, "w")
 	if(!isOpen(con)) stop("unable to connect to output file")
 	#check.webvis(wv)
 	wv$render <- "vis.root.render();"
-	writeLines(webvisToHTML(unfold.webvis(wv), title=title, protovis.path=protovis.path), con=con)
+	wv.out <- webvisToHTML(unfold.webvis(wv), title=title, protovis.path=protovis.path)
+	writeLines(wv.out, con=con)
 	close(con)
 	browseURL(url=file.name)
 }

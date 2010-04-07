@@ -9,4 +9,4 @@ Description: Create graphics for the web from R.  Currently provides basic funct
 License: BSD
 LazyLoad: no
 URL: http://code.google.com/p/rwebvis/
-Collate: 'util.R' 'zzz.R' 'protovis.R' 'protovis.marks.R' 
+Collate: 'protovis.marks.R' 'protovis.R' 'util.R' 'zzz.R'
