@@ -1,7 +1,8 @@
 \name{pv.scale}
 \alias{pv.scale}
 \title{A scaling function for protovis.}
-\usage{pv.scale(type, width, height, data, data.name, scale.min, scale.max, xmin, xmax, ymin, ymax)}
+\usage{pv.scale(type, width, height, data, data.name, scale.min, scale.max,
+    xmin, xmax, ymin, ymax)}
 \description{A scaling function for protovis.}
 \details{\code{pv.scale} A scaling function for protovis.}
 \value{The HTML output}
@@ -17,4 +18,4 @@
 \item{range.max}{The maximum value for the data to scale.}
 \item{scale.min}{The minimum scaled value.}
 \item{scale.max}{The maximum scaled value.}}
-\examples{pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)}
+\examples{pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)))}

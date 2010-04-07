@@ -1,7 +1,9 @@
 \name{new.webvis}
 \alias{new.webvis}
 \title{Create a new webvis object to store each layer of the visualization.}
-\usage{new.webvis(name="vis", root=pv.panel(width = width, height = height, ...), description, width=300, height=200, dataset, branch=list(), render, ...)}
+\usage{new.webvis(name="vis", root=pv.panel(width = width, height = height,
+    ...), description, width=300, height=200, dataset, branch=list(),
+    render, ...)}
 \description{Create a new webvis object to store each layer of the visualization.}
 \details{\code{new.webvis} Create a new webvis object to store each layer of the visualization.}
 \value{A webvis objectt.}

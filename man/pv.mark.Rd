@@ -13,7 +13,8 @@
 \item{data}{A dataset for plotting.}
 \item{...}{Any number of pv.param objects.}
 \item{anchor}{If anchoring to another object.}}
-\examples{pv.mark(wv=new.webvis(), type="Line", data=data.frame(y=1:5), 
+\examples{data <- data.frame(y=1:5)
+pv.mark(wv=new.webvis(), type="Line", data=data, 
 pv.param(name="data", value=data), 
 pv.param(name="bottom", data.name="y", scale="linear.y.y"))
 pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))

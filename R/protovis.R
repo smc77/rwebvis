@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-#' Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.
+#' Provides web graphics for R by wrapping visualization API's.  Currently supports Protovis.
 #'
 #' \tabular{ll}{
 #' Package: \tab webvis\cr
@@ -89,9 +89,12 @@ new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' webvisToHTML(new.webvis())
 #' webvisToHTML(wv=unfold.webvis(new.webvis() + pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=FALSE)))
-webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHead(title=title, protovis.path=protovis.path), tail=getTail(), protovis.path=PROTOVIS.PATH) {
+webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHead(title=title, protovis.path=protovis.path), tail=getTail(), protovis.path) {
+	if(!esse(protovis.path))
+		if(!exists("PROTOVIS.PATH"))
+			protovis.path <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
+		else protovis.path <- PROTOVIS.PATH
 	if(!is.webvis.flat(wv)) stop("webvisToHTML requires a webvis object")
 	wv.html <- c(paste("<center><div id='", div.id, "'>", sep=""), 
 		"<script type='text/javascript+protovis'>",
@@ -150,7 +153,7 @@ pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, sc
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)
+#' pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)))
 pv.scale <- function(type, width, height, data=NULL, data.name=NULL, scale.min=NULL, scale.max=NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL) {
 	type <- unlist(strsplit(type, ".", fixed=TRUE))
 	if(length(type) != 3) stop("scale type must be of format type.datarange.scale.range (e.g. linear.y.y)")
@@ -184,7 +187,7 @@ pv.parse <- function(param, wv, data) {
 	if(esse(data))
 		if(!field.exists("x", data)) 
 			data$x <- 1:length(data$y)
-	if(!is.null(param$value)) if(param$value == "d") param$value <- data
+	if(!is.null(param$value)) if(all(param$value == "d")) param$value <- data
 	if(is.null(param$data) && esse(data)) param$data <- data
 	if(!is.null(param$data) && field.exists(field=param$data.name, data=param$data)) { 
 		return(collapse(".", param$name, "(function(d) ", 
@@ -242,7 +245,7 @@ pv.panel <- function(wv, data, width=300, height=200, left, right, bottom, top) 
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' pv.dataset(data=wheat, name="wheat")
+#' pv.dataset(data=data.frame(wheat=1:10), name="wheat")
 pv.dataset <- function(data, name) {
 	paste("var", name, "=", pv.data(data))
 }
@@ -262,7 +265,8 @@ pv.dataset <- function(data, name) {
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
-#' pv.mark(wv=new.webvis(), type="Line", data=data.frame(y=1:5), 
+#' data <- data.frame(y=1:5)
+#' pv.mark(wv=new.webvis(), type="Line", data=data, 
 #' 		pv.param(name="data", value=data), 
 #' 		pv.param(name="bottom", data.name="y", scale="linear.y.y"))
 #' pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))
@@ -327,7 +331,7 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x")
-.pv.chart <- function(type, wv, data=NULL, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, 
+pv.chart <- function(type, wv, data=NULL, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, 
 		height, height.name, height.scale, width, width.name, width.scale, line.width, line.width.name, line.width.scale, 
 		size, size.name, size.scale, shape, shape.name, shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, 
 		angle, angle.name, angle.scale, start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, 
@@ -496,8 +500,10 @@ render.webvis <- function(wv, vis.name=NULL, file.name, title="", protovis.path)
 	file.name <- if(exists("OUTPUT.PATH")) {
 			if(!is.null(OUTPUT.PATH)) collapse(OUTPUT.PATH, vis.name, ".html") 
 		} else { collapse(tempfile(), ".html") }
-	if(!exists("PROTOVIS.PATH"))
-		protovis.path <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
+	if(!esse(protovis.path))
+		if(!exists("PROTOVIS.PATH"))
+			protovis.path <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
+		else protovis.path <- PROTOVIS.PATH
 	con=file(file.name, "w")
 	if(!isOpen(con)) stop("unable to connect to output file")
 	#check.webvis(wv)
@@ -506,4 +512,5 @@ render.webvis <- function(wv, vis.name=NULL, file.name, title="", protovis.path)
 	writeLines(wv.out, con=con)
 	close(con)
 	browseURL(url=file.name)
+	return(file.name)
 }

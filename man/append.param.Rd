@@ -1,7 +1,8 @@
 \name{append.param}
 \alias{append.param}
 \title{Generic function for all Protovis mark types.}
-\usage{append.param(paramlist, name, value, param.name, param.scale, scale.min, scale.max, xmin, xmax, ymin, ymax)}
+\usage{append.param(paramlist, name, value, param.name, param.scale,
+    scale.min, scale.max, xmin, xmax, ymin, ymax)}
 \description{Generic function for all Protovis mark types.}
 \details{\code{append.param} Generic function for all Protovis mark types.}
 \value{A webvis object.}

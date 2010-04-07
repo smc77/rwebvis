@@ -18,13 +18,13 @@
 #' @param left.name The name of the field in the supplied data frame or vector. 
 #' @param bottom.scale The name of the field in the supplied data frame or vector. 
 #' @param left.scale The name of the field in the supplied data frame or vector. 
-#' @param ... The parameters from .pv.chart 
+#' @param ... The parameters from pv.chart 
 #' @return A wv object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{.pv.chart}} that creates the webvis object.
+#' @seealso \code{\link{pv.chart}} that creates the webvis object.
 #' @examples
 #' #pv.line()
 #' #pv.line(anchor="top")	
@@ -58,7 +58,7 @@
 #' render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", interpolate="step-after"))
 #' 
 pv.line <- function(bottom.name="y", left.name="x", bottom.scale=paste("linear", bottom.name, "y", sep="."), left.scale="linear.x.x", ...) {
-	vis <- .pv.chart(type="Line", bottom.name=bottom.name, left.name=left.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
+	vis <- pv.chart(type="Line", bottom.name=bottom.name, left.name=left.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
 	vis
 }
 
@@ -76,13 +76,13 @@ pv.line <- function(bottom.name="y", left.name="x", bottom.scale=paste("linear",
 #' @param width.name
 #' @param xmax
 #' @param scale.min
-#' @param ... The parameters from .pv.chart 
+#' @param ... The parameters from pv.chart 
 #' @return A wv object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{.pv.chart}} that creates the webvis object.
+#' @seealso \code{\link{pv.chart}} that creates the webvis object.
 #' @examples
 #' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar", scale.min=0)
 #' pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=25, render=TRUE)
@@ -111,11 +111,33 @@ pv.bar <- function(height.name="y", left.name="x", height.scale="linear.y.y", le
 	n <- args[names(args)=="data"]$data
 	if(is.null(width) && is.null(width.name)) if(is.data.frame(n)) width <- (panel.width/nrow(n))/1.2 else width <- (panel.width/length(n))/1.2
 	if(is.null(xmax) && esse(panel.width)) xmax <- panel.width - width
-	vis <- .pv.chart(type="Bar", height.name=height.name, left.name=left.name, height.scale=height.scale, left.scale=left.scale, bottom=bottom, width=width, width.name=width.name, xmax=xmax, scale.min=scale.min, ...)
+	vis <- pv.chart(type="Bar", height.name=height.name, left.name=left.name, height.scale=height.scale, left.scale=left.scale, bottom=bottom, width=width, width.name=width.name, xmax=xmax, scale.min=scale.min, ...)
 	vis
 }
 
 
+#' Add a bar to the visualization.
+#'
+#' \code{pv.area} Adds a bar plot to the visualization
+#'
+#' @param height.name The name of the field in the supplied data frame or vector. 
+#' @param left.name The name of the field in the supplied data frame or vector. 
+#' @param height.scale The name of the field in the supplied data frame or vector. 
+#' @param left.scale The name of the field in the supplied data frame or vector. 
+#' @param height.name The name of the field in the supplied data frame or vector. 
+#' @param bottom
+#' @param width
+#' @param width.name
+#' @param xmax
+#' @param scale.min
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{pv.chart}} that creates the webvis object.
+#' @examples
 #' # line example 1 (using layers)
 #' wv <- new.webvis(width=150, height=150)
 #' render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom=0, height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x"))
@@ -144,7 +166,7 @@ pv.bar <- function(height.name="y", left.name="x", height.scale="linear.y.y", le
 #' #pv.area(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", ymin=10, ymax=100, bottom=0, render=TRUE)
 #' 
 pv.area <- function(bottom=0, height.name="y", left.name="x", height.scale=paste("linear", height.name, "y", sep="."), left.scale=paste("linear", left.name, "x", sep="."), scale.min=0, ...) {
-	vis <- .pv.chart(type="Area", bottom=bottom, height.name=height.name, left.name=left.name, height.scale=height.scale, left.scale=left.scale, scale.min=0, ...)
+	vis <- pv.chart(type="Area", bottom=bottom, height.name=height.name, left.name=left.name, height.scale=height.scale, left.scale=left.scale, scale.min=0, ...)
 	vis
 }
 
@@ -162,24 +184,24 @@ pv.wedge <- function(left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, 
 	n <- args[names(args)=="data"]$data
 	if(is.null(left)) if(is.data.frame(n)) width <- (panel.width/nrow(n))/1.2 else width <- (panel.width/length(n))/1.2
 	if(is.null(xmax) && esse(panel.width)) xmax <- panel.width - width
-	vis <- .pv.chart(type="Wedge", ..., normalize=TRUE)
+	vis <- pv.chart(type="Wedge", ..., normalize=TRUE)
 	vis
 }
 
 #' wv <- new.webvis(width=150, height=150)
 #' render.webvis(wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), ymax=140, xmax=140, xmin=10, ymin=10, scale.min=0))
 pv.dot <- function(left.name="x", bottom.name="y", bottom.scale=paste("linear", bottom.name, "y", sep="."), left.scale=paste("linear", left.name, "x", sep="."), ...) {
-	vis <- .pv.chart(type="Dot", left.name=left.name, bottom.name=bottom.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
+	vis <- pv.chart(type="Dot", left.name=left.name, bottom.name=bottom.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
 	vis
 }
 
 pv.shape <- function(...) {
-	vis <- .pv.chart(type="Shape", ...)
+	vis <- pv.chart(type="Shape", ...)
 	vis
 }
 
 pv.image <- function(...) {
-	vis <- .pv.chart(type="Image", ...)
+	vis <- pv.chart(type="Image", ...)
 	vis
 }
 
@@ -193,7 +215,7 @@ pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom
 			bottom.scale <- "linear.y.y"
 		} 
 	}
-	vis <- .pv.chart(type="Rule", data=data, left=left, left.name=left.name, left.scale=left.scale, bottom=bottom, bottom.name=bottom.name, bottom.scale=bottom.scale, ...)
+	vis <- pv.chart(type="Rule", data=data, left=left, left.name=left.name, left.scale=left.scale, bottom=bottom, bottom.name=bottom.name, bottom.scale=bottom.scale, ...)
 	vis
 }
 
@@ -204,6 +226,12 @@ pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom
 #' render.webvis(wv)
 #' 
 pv.label <- function(text, text.name, ...) {
-	vis <- .pv.chart(type="Label", text=text, text.name=text.name, ...)
+	vis <- pv.chart(type="Label", text=text, text.name=text.name, ...)
 	vis
 }
+#
+#wv <- new.webvis(root=pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20))
+#wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="right", text.name="y"))
+#wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="bottom", text.name="x"))
+#wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
+#render.webvis(wv)

@@ -10,4 +10,4 @@
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{data}{The dataset to be used in the graphic.}
 \item{name}{}}
-\examples{pv.dataset(data=wheat, name="wheat")}
+\examples{pv.dataset(data=data.frame(wheat=1:10), name="wheat")}

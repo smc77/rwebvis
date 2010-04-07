@@ -1,19 +1,20 @@
 \name{pv.line}
 \alias{pv.line}
 \title{Add a line to the visualization.}
-\usage{pv.line(bottom.name="y", left.name="x", bottom.scale=paste("linear", bottom.name, "y", sep = "."), left.scale="linear.x.x", ...)}
+\usage{pv.line(bottom.name="y", left.name="x", bottom.scale=paste("linear",
+    bottom.name, "y", sep = "."), left.scale="linear.x.x", ...)}
 \description{Add a line to the visualization.}
 \details{\code{pv.line} Adds a line plot to the visualization}
 \value{A wv object.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
-\seealso{\code{\link{.pv.chart}} that creates the webvis object.}
+\seealso{\code{\link{pv.chart}} that creates the webvis object.}
 \arguments{\item{bottom.name}{The name of the field in the supplied data frame or vector.}
 \item{left.name}{The name of the field in the supplied data frame or vector.}
 \item{bottom.scale}{The name of the field in the supplied data frame or vector.}
 \item{left.scale}{The name of the field in the supplied data frame or vector.}
-\item{...}{The parameters from .pv.chart}}
+\item{...}{The parameters from pv.chart}}
 \examples{#pv.line()
 #pv.line(anchor="top")	
 #pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=TRUE)

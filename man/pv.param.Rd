@@ -1,7 +1,8 @@
 \name{pv.param}
 \alias{pv.param}
 \title{A protovis mark parameter.}
-\usage{pv.param(name, data, data.name, value, scale, scale.min, scale.max, xmin, xmax, ymin, ymax, default, quote=TRUE)}
+\usage{pv.param(name, data, data.name, value, scale, scale.min, scale.max,
+    xmin, xmax, ymin, ymax, default, quote=TRUE)}
 \description{A protovis mark parameter.}
 \details{\code{pv.parameter} A protovis mark parameter.}
 \value{A webvis.param object.}

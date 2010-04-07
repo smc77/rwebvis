@@ -1,7 +1,7 @@
-\name{.pv.chart}
-\alias{.pv.chart}
+\name{pv.chart}
+\alias{pv.chart}
 \title{Add a line to the visualization.}
-\usage{.pv.chart(type, wv, data, bottom, bottom.name, bottom.scale, top,
+\usage{pv.chart(type, wv, data, bottom, bottom.name, bottom.scale, top,
     top.name, top.scale, left, left.name, left.scale, right,
     right.name, right.scale, height, height.name, height.scale, width,
     width.name, width.scale, line.width, line.width.name,

@@ -1,7 +1,9 @@
 \name{webvisToHTML}
 \alias{webvisToHTML}
 \title{Convert webvis to HTML.}
-\usage{webvisToHTML(wv, div.id="id", html.wrap=TRUE, title, head=getHead(title = title, protovis.path = protovis.path), tail=getTail(), protovis.path=PROTOVIS.PATH)}
+\usage{webvisToHTML(wv, div.id="id", html.wrap=TRUE, title, head=getHead(title
+    = title, protovis.path = protovis.path), tail=getTail(),
+    protovis.path)}
 \description{Convert webvis to HTML.}
 \details{\code{webvisToHTML} Convert webvis to HTML.}
 \value{The HTML output}
@@ -15,5 +17,4 @@
 \item{head}{The HTML above the webvis.}
 \item{tail}{The HTML below the webvis.}
 \item{protovis.path}{The path to the protovis javascript.}}
-\examples{webvisToHTML(new.webvis())
-webvisToHTML(wv=unfold.webvis(new.webvis() + pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=FALSE)))}
+\examples{webvisToHTML(wv=unfold.webvis(new.webvis() + pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", line.width=5, render=FALSE)))}
