@@ -156,8 +156,8 @@ pv.bar <- function(height.name="y", left.name="x", height.scale="linear.y.y", le
 #' render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", left.name="x", top.scale="linear.y.y", left.scale="linear.x.x"))
 #' 
 #' # line example 5
-#' wv <- new.webvis(width=150, height=150)
-#' render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
+#' wv <- pv.panel(width=150, height=150)
+#' render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom=0, top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
 #' 
 #' # line example 7
 #' wv <- new.webvis(width=150, height=150)
@@ -183,7 +183,6 @@ pv.wedge <- function(left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, 
 	panel.height <- args[names(args)=="wv"]$wv$height
 	n <- args[names(args)=="data"]$data
 	if(is.null(left)) if(is.data.frame(n)) width <- (panel.width/nrow(n))/1.2 else width <- (panel.width/length(n))/1.2
-	if(is.null(xmax) && esse(panel.width)) xmax <- panel.width - width
 	vis <- pv.chart(type="Wedge", ..., normalize=TRUE)
 	vis
 }
@@ -205,6 +204,12 @@ pv.image <- function(...) {
 	vis
 }
 
+#data <- data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
+#wv <- wv + (pv.rule(wv=wv, data=data, axis="y", stroke.style="rgba(128,128,128,.2)", scale.min=0) + pv.label(anchor="right", text.name="y"))
+#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+#wv <- wv + pv.line(wv=wv, data=data, scale.min=0)
+#render.webvis(wv)
 pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom.name, bottom.scale, ...) {
 	if(!is.null(axis)) {
 		if(axis=="x" && !esse(left) && !esse(left.name)) {
@@ -219,19 +224,12 @@ pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom
 	vis
 }
 
-#' wv <- new.webvis(root=pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20))
-#' wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="right", text.name="y"))
-#' wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="bottom", text.name="x"))
-#' wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
-#' render.webvis(wv)
-#' 
+#wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
+#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="right", text.name="y"))
+#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+#wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
+#render.webvis(wv)
 pv.label <- function(text, text.name, ...) {
 	vis <- pv.chart(type="Label", text=text, text.name=text.name, ...)
 	vis
 }
-#
-#wv <- new.webvis(root=pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20))
-#wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="right", text.name="y"))
-#wv <- wv + (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)")) + pv.label(anchor="bottom", text.name="x"))
-#wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
-#render.webvis(wv)

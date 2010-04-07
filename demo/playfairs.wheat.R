@@ -88,21 +88,21 @@ close(con)
 wheat$wages <- as.numeric(wheat$wages)
 #save(monarch, wheat, file="c:/Programming/src/R/webvis/data/pw.demo.Rda")
 
-wv <- new.webvis(root=pv.panel(right=60, top=20, bottom=20, width=800, height=445), width=800, height=445)
+wv <- pv.panel(right=60, top=20, bottom=20, width=800, height=445)
 
-wt <- new.webvis(root=pv.area(wv=wv, data=wheat, interpolate="step-after", height.name="wheat", left.name="year", left.scale="linear.year.x", ymin=0, fill.style="#aaa", stroke.style="#999", scale.min=0))
+wt <- pv.area(wv=wv, data=wheat, interpolate="step-after", height.name="wheat", left.name="year", left.scale="linear.year.x", ymin=0, fill.style="#aaa", stroke.style="#999", scale.min=0)
 wt <- wt + pv.rule()
 wv <- wv + wt
 
-wg <- new.webvis(root=pv.area(wv=wv, data=wheat, height.name="wages", left.name="year", fill.style="hsla(195, 50%, 80%, .75)", scale.min=0, scale.max=100))
+wg <- pv.area(wv=wv, data=wheat, height.name="wages", left.name="year", fill.style="hsla(195, 50%, 80%, .75)", scale.min=0, scale.max=100)
 wg <- wg + pv.line(line.width=4, stroke.style="lightcoral", anchor="top", bottom.name=NULL, left.name=NULL, fill.style="null")
 wg <- wg + pv.line(line.width=1.5, stroke.style="black", anchor="top", bottom.name=NULL, left.name=NULL, fill.style="null")
 wv <- wv + wg
 
 wv <- wv + pv.label(left=130, bottom=31, font="italic 10px serif", text="Weekly Wages of a Good Mechanic")
 
-wr <- new.webvis(root=pv.rule(bottom=-0.5))
-wr2 <- new.webvis(root=pv.rule(wv=wv, data=data.frame(y=seq(0,100,10)), bottom=0, height.name="y", height.scale="linear.y.y", ymin=0, ymax=100, stroke.style="rgba(255, 255, 255, .2)"))
+wr <- pv.rule(bottom=-0.5)
+wr2 <- pv.rule(wv=wv, data=data.frame(y=seq(0,100,10)), bottom=0, height.name="y", height.scale="linear.y.y", ymin=0, ymax=100, stroke.style="rgba(255, 255, 255, .2)")
 wr2 <- wr2 + pv.label(anchor="right", text.name="y")
 wr <- wr + wr2
 wv <- wv + wr

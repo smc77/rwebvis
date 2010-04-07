@@ -37,7 +37,12 @@ NULL
 `+.webvis` <- function (parent, child) {
 	# check that the parent is a "webvis" object; if not, use normal + operation
 	i <- length(parent$branch)
-	parent$branch[[i+1]] <- child
+	# this section was testing to see if I could inherit the wv object to the child object,
+	# but it doesn't work if there are nested statements (e.g. c + (a + b))
+	#f <- substitute(child)
+	#f[["wv2"]] <- parent
+	#child <- eval(f) 
+	parent$branch[[i+1]] <- child 
 	parent
 }
 
@@ -59,7 +64,7 @@ NULL
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
 #' new.webvis()
-new.webvis <- function(name="vis", root=pv.panel(width=width, height=height, ...), description=NULL, width=300, height=200, dataset=NULL, branch=list(), render=NULL, ...) {
+new.webvis <- function(name="vis", root=NULL, description=NULL, width=300, height=200, dataset=NULL, branch=list(), render=NULL, ...) {
 	wv <- list(name=name,
 		description=description, 
 		width=width,
@@ -218,7 +223,8 @@ pv.parse <- function(param, wv, data) {
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-pv.panel <- function(wv, data, width=300, height=200, left, right, bottom, top) {
+pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, top) {
+	if(!esse(wv)) { wv <- new.webvis(width=width, height=height) }
 	params <- list((if(esse(data)) pv.param(name="data", value="d") else NULL), 
 		pv.param(name="width", value=width),
 		pv.param(name="height", value=height),
@@ -228,11 +234,15 @@ pv.panel <- function(wv, data, width=300, height=200, left, right, bottom, top) 
 		pv.param(name="top", value=top))
 	missing.param <- (unlist(lapply(params, is.null)))
 	params <- params[which(!missing.param)]
-	vis <- pv.mark(wv=wv, data=data, type="Panel", params)
-	vis
+	panel <- pv.mark(wv=wv, data=data, type="Panel", params)
+	if(is.null(wv$root)) wv$root <- panel
+	else wv <- wv + panel
+	wv
 }
-#pv.panel()
-#pv.panel(right=60, top=20, bottom=20, width=800, height=445)
+
+#pv.panel(width=NULL, height=NULL)
+#render.webvis(wv=pv.panel(right=60, top=20, bottom=20, width=800, height=445))
+
 #' Add a dataset as a variable to the visualization.
 #'
 #' \code{pv.dataset} Add a dataset as a variable to the visualization.
@@ -331,13 +341,13 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x")
-pv.chart <- function(type, wv, data=NULL, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, 
+pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, 
 		height, height.name, height.scale, width, width.name, width.scale, line.width, line.width.name, line.width.scale, 
 		size, size.name, size.scale, shape, shape.name, shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, 
 		angle, angle.name, angle.scale, start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, 
 		text, text.name, text.scale, font, text.style, text.align, text.baseline, text.margin, text.angle,  
 		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, scale.min=NULL, scale.max=NULL, anchor=NULL, render=FALSE, normalize=FALSE, ...) {
-	if(!esse(wv)) { wv <- new.webvis() }
+	if(!esse(wv)) { if(esse(wv2)) wv <- wv2 else wv <- pv.panel() }
 	if(esse(data)) {
 		if(is.vector(data))
 			data <- data.frame(y=data)
@@ -375,11 +385,11 @@ pv.chart <- function(type, wv, data=NULL, bottom, bottom.name, bottom.scale, top
 	paramlist <- append.param(paramlist=paramlist, name="textMargin", value=text.margin)
 	paramlist <- append.param(paramlist=paramlist, name="textAngle", value=text.angle)
 	# assemble the mark
-	vis <- pv.mark(wv=wv, data=data, type=type, paramlist, anchor=anchor)
-	#vis <- new.webvis(root=vis)
-	if(render) render.webvis(wv=(wv + vis)) else vis
+	vis <- new.webvis(root=pv.mark(wv=wv, data=data, type=type, paramlist, anchor=anchor))
+	if(render) { render.webvis(wv=(wv + vis)); return(wv + vis) } else vis
 }
-
+#wv2 <- pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", render=TRUE)
+#unfold.webvis(wv2)
 
 #' Create the final visualization from the webvis object.
 #'
@@ -398,7 +408,7 @@ pv.chart <- function(type, wv, data=NULL, bottom, bottom.name, bottom.scale, top
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 unfold.webvis <- function(wv, name="vis", parent=NULL) {
-	root <- paste("var", name, "=", if(is.null(parent)) paste("new ", wv$root$type, "()", sep="") else paste(parent, ".add(", wv$root$type, ")", sep=""), wv$root$parameters)
+	root <- paste("var", name, "=", if(is.null(parent)) paste("new ", wv$root$type, "()", sep="") else paste(parent, if(!is.null(wv$root$anchor)) paste(".anchor('", wv$root$anchor, "')", sep="") else "", ".add(", wv$root$type, ")", sep=""), wv$root$parameters)
 	wv2 <- as.list(wv$branch)
 	if(length(wv2)) {
 		wv2 <- unlist(lapply(wv2, function(x) {
@@ -432,20 +442,25 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' @examples
 #' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
 #' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
-plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
-	if(!(class(data) == "data.frame") && is.vector(data))
-		data <- data.frame(y=data)
-	wv <- new.webvis(width=width, height=height)
+plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=0, ...) {
+	if(is.null(y) && is.vector(x)) {
+		data <- data.frame(y=x, x=1:length(x))
+	} else { data <- data.frame(x=x, y=y) }
+	wv <- pv.panel(width=width+50, height=height+50, left=50, bottom=50, right=50, top=50)
 	wv <- if(type=="bar") {
 		wv + pv.bar(wv=wv, data=data, ...)
 	} else if(type=="line") {
-		wv + pv.line(wv=wv, data=data, ...)
+		wv + pv.line(wv=wv, data=data, scale.min=scale.min, ...)
 	} else if(type=="dot") {
-		wv + pv.dot(wv=wv, data=data, ...)
+		wv + pv.dot(wv=wv, data=data, scale.min=scale.min, ...)
 	} else if(type=="pie") {
 		wv + pv.wedge(wv=wv, data=data, ...)
 	} else if(type=="area") {
-		wv + pv.area(wv=wv, data=data, ...)
+		wv + pv.area(wv=wv, data=data, scale.min=scale.min, ...)
+	}
+	if(add.grid) {
+		wv <- wv + (pv.rule(wv=wv, data=as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))), axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="left", text.name="y"))
+		wv <- wv + (pv.rule(wv=wv, data=data.frame(x=as.numeric(sprintf("%.1f", seq(min(data$x), max(data$x), (max(data$x)/(nrow(data)/2)))))), axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
 	}
 	if(type!="pie") {
 		wv <- wv + pv.rule(wv=wv, bottom=0)
@@ -453,6 +468,13 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	}
 	render.webvis(wv)
 }
+plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5))
+plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="area")
+plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
+plot.webvis(x=1000*rnorm(20), type="line", scale.min=NULL)
+plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="line")
+plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="area")
+plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
 
 #' Add a panel to the visualization.
 #'
