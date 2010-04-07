@@ -1,9 +1,9 @@
-\name{pv.mark}
-\alias{pv.mark}
+\name{append.param}
+\alias{append.param}
 \title{Generic function for all Protovis mark types.}
-\usage{pv.mark(wv, type, data, ..., anchor)}
+\usage{append.param(paramlist, name, value, param.name, param.scale, scale.min, scale.max, xmin, xmax, ymin, ymax)}
 \description{Generic function for all Protovis mark types.}
-\details{\code{pv.mark} Generic function for all Protovis mark types.}
+\details{\code{append.param} Generic function for all Protovis mark types.}
 \value{A webvis object.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
@@ -13,8 +13,3 @@
 \item{data}{A dataset for plotting.}
 \item{...}{Any number of pv.param objects.}
 \item{anchor}{If anchoring to another object.}}
-\examples{pv.mark(wv=new.webvis(), type="Line", data=data.frame(y=1:5), 
-pv.param(name="data", value=data), 
-pv.param(name="bottom", data.name="y", scale="linear.y.y"))
-pv.mark(type="Label", ...=pv.param(name="text", data.name="y"))
-pv.parse(pv.param(name="text", data.name="y"), data=data.frame(y=1:5))}

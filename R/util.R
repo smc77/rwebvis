@@ -1,3 +1,4 @@
+###############################################################################
 #
 # webvis: An R package to create web visualizations.
 # author: Shane Conway <shane.conway@gmail.com>
@@ -5,7 +6,7 @@
 # This is released under a BSD license.
 #
 # Documentation was created using roxygen:
-# NAMESPACE.FILE <- FALSE; roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
+# roxygenize('webvis', roxygen.dir='webvis', copy.package=FALSE, unlink.target=FALSE)
 #
 ###############################################################################
 

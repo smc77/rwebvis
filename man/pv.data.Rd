@@ -1,7 +1,7 @@
 \name{pv.data}
 \alias{pv.data}
 \title{Add a panel to the visualization.}
-\usage{pv.data(data, quote=TRUE)}
+\usage{pv.data(data, quote=FALSE)}
 \description{Add a panel to the visualization.}
 \details{\code{protovis.data} Adds a panel to the visualization}
 \value{A wv object.}

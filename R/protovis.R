@@ -10,6 +10,29 @@
 #
 ###############################################################################
 
+#' Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.
+#'
+#' \tabular{ll}{
+#' Package: \tab webvis\cr
+#' Type: \tab Package\cr
+#' Version: \tab 0.1\cr
+#' Date: \tab 2010-03-22\cr
+#' License: \tab BSD (>= 2)\cr
+#' LazyLoad: \tab no\cr
+#' }
+#'
+#' Uses Protovis to provide web graphics for R.
+#' 
+#' @name webvis-package
+#' @aliases webvis
+#' @docType package
+#' @title Web graphics for R.
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis}
+#' @keywords package
+NULL
+
 
 `+.webvis` <- function (parent, child) {
 	# check that the parent is a "webvis" object; if not, use normal + operation
@@ -153,6 +176,7 @@ pv.scale <- function(type, width, height, data=NULL, data.name=NULL, scale.min=N
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
+#' @examples
 #' pv.parse(pv.param(name="text", data.name="y"))
 #' pv.parse(pv.param(name="text", data.name="y"), data=data.frame(y=1:5))
 pv.parse <- function(param, wv, data) {
@@ -256,6 +280,20 @@ pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
 	vis
 }
 
+#' Generic function for all Protovis mark types.
+#'
+#' \code{append.param} Generic function for all Protovis mark types.
+#'
+#' @param wv A webvis object
+#' @param type Can be "Line", "Bar", etc. (see Protovis API)
+#' @param data A dataset for plotting.
+#' @param ... Any number of pv.param objects.
+#' @param anchor If anchoring to another object.
+#' @return A webvis object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
 append.param <- function(paramlist, name, value, param.name, param.scale, scale.min=NULL, scale.max=NULL, xmin, xmax, ymin, ymax) {
 	if(esse(value)) {
 		paramlist[[length(paramlist) + 1]] <- pv.param(name=name, value=if(name=="data") "d" else value) 
@@ -338,37 +376,10 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 	if(render) render.webvis(wv=(wv + vis)) else vis
 }
 
-#' Add a panel to the visualization.
-#'
-#' \code{protovis.data} Adds a panel to the visualization
-#'
-#' @param data The webvis object containing the visualization. 
-#' @return A wv object.
-#' @keywords graphics
-#' @author Shane Conway \email{shane.conway@@gmail.com}
-#' @references
-#' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{new.webvis}} that creates the webvis object.
-# @examples
-#' 
-pv.data <- function(data, quote=FALSE) {
-	if(data == "null") return(data)
-	if(is.character(data) && length(data)==1) if(quote) return(collapse("'", data, "'")) else data
-	if(is.numeric(data) && length(data)==1) return(data)
-	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
-	if(is.vector(data)) {
-		data <- paste("[", 
-				paste(as.matrix(data), collapse=", "), 
-				"]", sep="")		
-	} else if(class(data) %in% c("data.frame")) {
-		data <- paste("[", paste(lapply(1:nrow(data), function(i) { k <- data[i,]; nm <- colnames(data); paste("{", paste(paste(nm, ":", k), collapse=", "), "}") }), collapse=","), "]")
-	}
-	return(data)
-}
 
 #' Create the final visualization from the webvis object.
 #'
-#' \code{render.webvis} Renders the visualization from the webvis object.
+#' \code{unfold.webvis} Renders the visualization from the webvis object.
 #'
 #' @param wv The webvis object containing the visualization. 
 #' @param vis.name The file name of the output HTML.
@@ -382,18 +393,6 @@ pv.data <- function(data, quote=FALSE) {
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-# @examples
-#' 
-render.webvis <- function(wv, vis.name=NULL, file.name=if(!is.null(OUTPUT.PATH)) collapse(OUTPUT.PATH, vis.name, ".html") else collapse(tempfile(), ".html"), title="", protovis.path=PROTOVIS.PATH) {
-	con=file(file.name, "w")
-	if(!isOpen(con)) stop("unable to connect to output file")
-	#check.webvis(wv)
-	wv$render <- "vis.root.render();"
-	writeLines(webvisToHTML(unfold.webvis(wv), title=title, protovis.path=protovis.path), con=con)
-	close(con)
-	browseURL(url=file.name)
-}
-
 unfold.webvis <- function(wv, name="vis", parent=NULL) {
 	root <- paste("var", name, "=", if(is.null(parent)) paste("new ", wv$root$type, "()", sep="") else paste(parent, ".add(", wv$root$type, ")", sep=""), wv$root$parameters)
 	wv2 <- as.list(wv$branch)
@@ -428,10 +427,7 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
 #' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
-#
-##
-##plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
-
+#' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
 plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	if(!(class(data) == "data.frame") && is.vector(data))
 		data <- data.frame(y=data)
@@ -453,70 +449,55 @@ plot.webvis <- function(data, type="bar", width=500, height=500, ...) {
 	}
 	render.webvis(wv)
 }
-# plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
-# plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", scale.min=0)
 
-#' Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.
+#' Add a panel to the visualization.
 #'
-#' \tabular{ll}{
-#' Package: \tab webvis\cr
-#' Type: \tab Package\cr
-#' Version: \tab 0.1\cr
-#' Date: \tab 2010-03-22\cr
-#' License: \tab BSD (>= 2)\cr
-#' LazyLoad: \tab no\cr
-#' }
+#' \code{protovis.data} Adds a panel to the visualization
 #'
-#' Uses Protovis to provide web graphics for R.
-#' 
-#' @name webvis-package
-#' @aliases webvis
-#' @docType package
-#' @title Web graphics for R.
+#' @param data The webvis object containing the visualization. 
+#' @return A wv object.
+#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
-#' \url{http://vis.stanford.edu/protovis}
-#' @keywords package
-NULL
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+pv.data <- function(data, quote=FALSE) {
+	if(all(data == "null")) return(data)
+	if(is.character(data) && length(data)==1) if(quote) return(collapse("'", data, "'")) else data
+	if(is.numeric(data) && length(data)==1) return(data)
+	if(is.logical(data) && length(data)==1) return(tolower(as.character(data)))
+	if(is.vector(data)) {
+		data <- paste("[", 
+				paste(as.matrix(data), collapse=", "), 
+				"]", sep="")		
+	} else if(class(data) %in% c("data.frame")) {
+		data <- paste("[", paste(lapply(1:nrow(data), function(i) { k <- data[i,]; nm <- colnames(data); paste("{", paste(paste(nm, ":", k), collapse=", "), "}") }), collapse=","), "]")
+	}
+	return(data)
+}
 
-
-#
-##	
-#wv <- new.webvis()
-#wv <- wv + pv.bar(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2)))
-#render.webvis(wv=wv)
-#
-#wv <- new.webvis()
-#line <- new.webvis(root=pv.line(wv, data=data.frame(y=c(1, 2, 1.5, 3, 1.2))))
-##line <- line + pv.label(line, text.style="white", anchor="top") 
-#wv <- wv + line
-#wv <- wv + pv.rule(wv, bottom=0)
-#wv <- wv + pv.rule(wv, left=0)
-#render.webvis(wv=wv)
-
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2))
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "pie")
-
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
-#
-#
-#plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line", interpolate="step-after", line.width=5)
-#plot.webvis(data=data.frame(y=c(1, 2, 1.5, 3, 1.2), width=1:5), "line", interpolate="step-after")
-
-
-#
-#render.webvis(new.webvis() + (new.webvis(root=pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=30))+ pv.label(data=1:7, text.name="y", anchor="top", text.style="white")))
-#
-#wv <- new.webvis(root=pv.panel(width=150, height=150), width=150, height=150)
-#render.webvis((wv + 
-#		(new.webvis(wv=wv, root=pv.bar(wv=wv, data=c(1, 1.2, 1.5, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=10, width=20, ymin=0, ymax=140))
-#			+ pv.label(wv=wv, data=1:7, text.name="y", anchor="top", text.style="white")))
-#	+ (new.webvis(wv=wv, root=pv.rule(wv=wv, data=1:4, bottom.name="y", bottom.scale="linear.y.y", ymin=10)))# + pv.label(data=data, text="d"))
-#	+ pv.rule(wv=wv, left=0, bottom=0)
-#)
-#remove(wv)
-
-
-
+#' Create the final visualization from the webvis object.
+#'
+#' \code{render.webvis} Renders the visualization from the webvis object.
+#'
+#' @param wv The webvis object containing the visualization. 
+#' @param vis.name The file name of the output HTML.
+#' @param path The file path to the HTML file. 
+#' @param file.name The file path to the HTML file. 
+#' @param title The file path to the HTML file. 
+#' @param protovis.path The file path to the HTML file.
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+#' @seealso \code{\link{new.webvis}} that creates the webvis object.
+render.webvis <- function(wv, vis.name=NULL, file.name=if(!is.null(OUTPUT.PATH)) collapse(OUTPUT.PATH, vis.name, ".html") else collapse(tempfile(), ".html"), title="", protovis.path=PROTOVIS.PATH) {
+	con=file(file.name, "w")
+	if(!isOpen(con)) stop("unable to connect to output file")
+	#check.webvis(wv)
+	wv$render <- "vis.root.render();"
+	writeLines(webvisToHTML(unfold.webvis(wv), title=title, protovis.path=protovis.path), con=con)
+	close(con)
+	browseURL(url=file.name)
+}

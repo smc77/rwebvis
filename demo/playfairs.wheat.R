@@ -1,3 +1,4 @@
+###############################################################################
 #
 # webvis: An R package to create web visualizations.
 # author: Shane Conway <shane.conway@gmail.com>

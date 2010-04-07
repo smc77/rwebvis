@@ -13,3 +13,5 @@
 \item{type}{The type of plot.  Can be "bar", "line", "area", "pie", "dot", or "..."}
 \item{width}{The width of the panel in pixels.}
 \item{height}{The width of the panel in pixels.}}
+\examples{plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
+plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")}
