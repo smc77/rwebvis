@@ -347,7 +347,7 @@ pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale
 		angle, angle.name, angle.scale, start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, 
 		text, text.name, text.scale, font, text.style, text.align, text.baseline, text.margin, text.angle,  
 		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, scale.min=NULL, scale.max=NULL, anchor=NULL, render=FALSE, normalize=FALSE, ...) {
-	if(!esse(wv)) { if(esse(wv2)) wv <- wv2 else wv <- pv.panel() }
+	if(!esse(wv)) { wv <- pv.panel() }
 	if(esse(data)) {
 		if(is.vector(data))
 			data <- data.frame(y=data)
@@ -440,8 +440,8 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
-#' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "line")
-#' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "area")
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), "line")
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), "area")
 plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=0, ...) {
 	if(is.null(y) && is.vector(x)) {
 		data <- data.frame(y=x, x=1:length(x))
@@ -458,23 +458,27 @@ plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=T
 	} else if(type=="area") {
 		wv + pv.area(wv=wv, data=data, scale.min=scale.min, ...)
 	}
-	if(add.grid) {
-		wv <- wv + (pv.rule(wv=wv, data=as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))), axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="left", text.name="y"))
-		wv <- wv + (pv.rule(wv=wv, data=data.frame(x=as.numeric(sprintf("%.1f", seq(min(data$x), max(data$x), (max(data$x)/(nrow(data)/2)))))), axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
-	}
 	if(type!="pie") {
-		wv <- wv + pv.rule(wv=wv, bottom=0)
-		wv <- wv + pv.rule(wv=wv, left=0)
+		if(add.grid) {
+			#print(as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))))
+			wv <- wv + (pv.rule(wv=wv, data=as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))), axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="left", text.name="y"))
+			wv <- wv + (pv.rule(wv=wv, data=data.frame(x=as.numeric(sprintf("%.1f", seq(min(data$x), max(data$x), (max(data$x)/(nrow(data)/2)))))), axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+		}
+		if(add.axes) {
+			wv <- wv + pv.rule(wv=wv, bottom=0)
+			wv <- wv + pv.rule(wv=wv, left=0)
+		}
 	}
 	render.webvis(wv)
 }
-plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5))
-plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="area")
-plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
-plot.webvis(x=1000*rnorm(20), type="line", scale.min=NULL)
-plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="line")
-plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="area")
-plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
+#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), add.grid=F)
+#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="area")
+#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
+#plot.webvis(x=1000*rnorm(20), width=500, height=500, type="line", scale.min=NULL)
+#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="line")
+#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="area")
+#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie")
+#plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
 
 #' Add a panel to the visualization.
 #'

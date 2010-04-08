@@ -174,18 +174,22 @@ pv.area <- function(bottom=0, height.name="y", left.name="x", height.scale=paste
 #
 # http://code.google.com/p/protovis-js/wiki/PvWedge
 #
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), left=75, bottom=75, outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), left=150, bottom=75, inner.radius=50, outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2), rad=20*(1:7)), left=75, bottom=75, inner.radius=50, outer.radius.name="rad", angle.name="y", render=TRUE)
-pv.wedge <- function(left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, outer.radius=NULL, ...) {
-	args <- list(...)
-	panel.width <- args[names(args)=="wv"]$wv$width
-	panel.height <- args[names(args)=="wv"]$wv$height
-	n <- args[names(args)=="data"]$data
-	if(is.null(left)) if(is.data.frame(n)) width <- (panel.width/nrow(n))/1.2 else width <- (panel.width/length(n))/1.2
-	vis <- pv.chart(type="Wedge", ..., normalize=TRUE)
+#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
+#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), outer.radius=70, angle.name="y", render=TRUE)
+#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), inner.radius=50, outer.radius=70, angle.name="y", render=TRUE)
+#pv.wedge(data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2), rad=20*(1:7)), inner.radius=50, outer.radius.name="rad", angle.name="y", render=TRUE)
+pv.wedge <- function(wv=pv.panel(), left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, outer.radius=NULL, ...) {
+	print(angle.name)
+	panel.width <- wv$width
+	panel.height <- wv$height
+	if(is.null(left)) left <- panel.width/2
+	if(is.null(bottom)) bottom <- panel.height/2
+	if(is.null(outer.radius)) outer.radius <- min(panel.width, panel.height)/2
+	vis <- pv.chart(type="Wedge", left=left, bottom=bottom, angle.name=angle.name, inner.radius=inner.radius, outer.radius=outer.radius, ..., normalize=TRUE)
 	vis
 }
+
+
 
 #' wv <- new.webvis(width=150, height=150)
 #' render.webvis(wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), ymax=140, xmax=140, xmin=10, ymin=10, scale.min=0))
