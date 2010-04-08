@@ -15,7 +15,7 @@
 #' \tabular{ll}{
 #' Package: \tab webvis\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.1\cr
+#' Version: \tab 0.0.1\cr
 #' Date: \tab 2010-03-22\cr
 #' License: \tab BSD (>= 2)\cr
 #' LazyLoad: \tab no\cr
@@ -34,6 +34,17 @@
 NULL
 
 
+#' Add a new layers to a visualization.
+#'
+#' \code{+.webvis} Add a new layers to a visualization.
+#'
+#' @param parent The root node.
+#' @param child The leaf node.
+#' @return A webvis object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
 `+.webvis` <- function (parent, child) {
 	# check that the parent is a "webvis" object; if not, use normal + operation
 	i <- length(parent$branch)
@@ -50,21 +61,22 @@ NULL
 #'
 #' \code{new.webvis} Create a new webvis object to store each layer of the visualization.
 #'
-#' @param root The root node of the visualization.
-#' @param branch A node layer underneath the root visualization.
 #' @param width  The width in pixels.
 #' @param height The height in pixels.
 #' @param name The name of the visualization.
 #' @param description A description of the visualization.
 #' @param dataset A dataset associated with the visualization.
-#' @return A webvis objectt.
+#' @param root The root node of the visualization (the primary root should be a panel).
+#' @param branch A node layer underneath the root visualization.
+#' @param render The render command for the given visualization.
+#' @return A webvis object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
 #' new.webvis()
-new.webvis <- function(name="vis", root=NULL, description=NULL, width=300, height=200, dataset=NULL, branch=list(), render=NULL, ...) {
+new.webvis <- function(name="vis", description=NULL, width=300, height=200, dataset=NULL, root=NULL, branch=list(), render=NULL, ...) {
 	wv <- list(name=name,
 		description=description, 
 		width=width,
@@ -81,7 +93,7 @@ new.webvis <- function(name="vis", root=NULL, description=NULL, width=300, heigh
 #'
 #' \code{webvisToHTML} Convert webvis to HTML.
 #'
-#' @param wv A webvis object.
+#' @param wv A webvis.flat object (from the unfold.webvis function()).
 #' @param div.id The div tag id.
 #' @param html.wrap Whether to wrap the visualization in other supplied HTML.
 #' @param title The title of the HTML page.
@@ -100,8 +112,8 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHe
 		if(!exists("PROTOVIS.PATH"))
 			protovis.path <- "http://protovis-js.googlecode.com/svn/trunk/protovis-d3.1.js"
 		else protovis.path <- PROTOVIS.PATH
-	if(!is.webvis.flat(wv)) stop("webvisToHTML requires a webvis object")
-	wv.html <- c(paste("<center><div id='", div.id, "'>", sep=""), 
+	if(!is.webvis.flat(wv)) stop("webvisToHTML requires a webvis.flat object; need to call unfold.webvis first.")
+	wv.html <- c(collapse("<center><div id='", div.id, "'>"), 
 		"<script type='text/javascript+protovis'>",
 		as.character(wv),
 		"</script></div></center>")
@@ -111,17 +123,19 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHe
 
 #' A protovis mark parameter.
 #'
-#' \code{pv.parameter} A protovis mark parameter.
+#' \code{pv.param} A protovis mark parameter.
 #'
 #' @param name The name of mark parameter.
 #' @param data The data used in the parameter settings.
 #' @param data.name The name of the field in the dataset.
 #' @param value An explicit value for the parameter.
 #' @param scale Whether the value or data should be scaled.  Can be "linear", "log", or ...
-#' @param range.min The minimum value for the range (or defaults to the minimum from the data).
-#' @param range.max The maximum value for the range (or defaults to the maximum from the data.
 #' @param scale.min The minimum scaled value (or defaults to zero) in pixels.
 #' @param scale.max The maximum scaled value (or defaults to the height/width of the visualization) in pixels.
+#' @param xmin The minimum x value for the scaled output.
+#' @param xmax The maximum x value for the scaled output.
+#' @param ymin The minimum y value for the scaled output.
+#' @param ymax The maximum y value for the scaled output.
 #' @param default The default value for the parameter.
 #' @param quote Whether character values should be quoted.
 #' @return A webvis.param object.
@@ -148,10 +162,12 @@ pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, sc
 #' @param height The height of the panel.
 #' @param data The data for the panel.
 #' @param data.name The name of the variable to be scaled.
-#' @param range.min The minimum value for the data to scale.
-#' @param range.max The maximum value for the data to scale.
-#' @param scale.min The minimum scaled value.
-#' @param scale.max The maximum scaled value.
+#' @param scale.min The minimum scaled value (or defaults to zero) in pixels.
+#' @param scale.max The maximum scaled value (or defaults to the height/width of the visualization) in pixels.
+#' @param xmin The minimum x value for the scaled output.
+#' @param xmax The maximum x value for the scaled output.
+#' @param ymin The minimum y value for the scaled output.
+#' @param ymax The maximum y value for the scaled output.
 #' @return The HTML output
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
@@ -215,15 +231,23 @@ pv.parse <- function(param, wv, data) {
 #'
 #' \code{pv.panel} A protovis panal.
 #'
-#' @param param A webvis param object from pv.param().
-#' @param wv A webvis object.
-#' @param data A dataset.
+#' @param wv A webvis param object from pv.param().
+#' @param data A webvis object.
+#' @param width The width of the panel (in pixels).
+#' @param height The height of the panel (in pixels).
+#' @param left Where the panel should start with respect to the left of the window.
+#' @param right Where the panel should start with respect to the right of the window.
+#' @param bottom Where the panel should start with respect to the bottom of the window.
+#' @param top Where the panel should start with respect to the top of the window.
 #' @return The HTML output
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, top) {
+#' @examples 
+#' pv.panel() # the default panel size
+#' pv.panel(width=NULL, height=NULL, anchor="bottom") # a panel with no settings anchored to a parent object
+pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, top, anchor=NULL) {
 	if(!esse(wv)) { wv <- new.webvis(width=width, height=height) }
 	params <- list((if(esse(data)) pv.param(name="data", value="d") else NULL), 
 		pv.param(name="width", value=width),
@@ -234,14 +258,11 @@ pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, 
 		pv.param(name="top", value=top))
 	missing.param <- (unlist(lapply(params, is.null)))
 	params <- params[which(!missing.param)]
-	panel <- pv.mark(wv=wv, data=data, type="Panel", params)
+	panel <- pv.mark(wv=wv, data=data, type="Panel", params, anchor=anchor)
 	if(is.null(wv$root)) wv$root <- panel
 	else wv <- wv + panel
 	wv
 }
-
-#pv.panel(width=NULL, height=NULL)
-#render.webvis(wv=pv.panel(right=60, top=20, bottom=20, width=800, height=445))
 
 #' Add a dataset as a variable to the visualization.
 #'
@@ -262,7 +283,8 @@ pv.dataset <- function(data, name) {
 
 #' Generic function for all Protovis mark types.
 #'
-#' \code{pv.mark} Generic function for all Protovis mark types.
+#' \code{pv.mark} Generic function for all Protovis mark types.  This function can be used
+#'   to create any kind of Protovis object regardless of whether it has been exposed separately.
 #'
 #' @param wv A webvis object
 #' @param type Can be "Line", "Bar", etc. (see Protovis API)
@@ -294,16 +316,23 @@ pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
 	vis
 }
 
-#' Generic function for all Protovis mark types.
+#' Used in pv.chart to correctly combine parameters from the input.
 #'
-#' \code{append.param} Generic function for all Protovis mark types.
+#' \code{append.param} Used in pv.chart to correctly combine parameters from the input.  A "value" has a higher priority than
+#'   a name in the data.
 #'
-#' @param wv A webvis object
-#' @param type Can be "Line", "Bar", etc. (see Protovis API)
-#' @param data A dataset for plotting.
-#' @param ... Any number of pv.param objects.
-#' @param anchor If anchoring to another object.
-#' @return A webvis object.
+#' @param paramlist A list of parameters, to be appended.
+#' @param name The name of the Protovis parameter (e.g. "width").
+#' @param value A specific value for the parameter (e.g. 200).
+#' @param param.name The name of the field in the dataset (if not supplying specific value).
+#' @param param.scale The scaling for the parameter.
+#' @param scale.min The minimum scaled value (or defaults to zero) in pixels.
+#' @param scale.max The maximum scaled value (or defaults to the height/width of the visualization) in pixels.
+#' @param xmin The minimum x value for the scaled output.
+#' @param xmax The maximum x value for the scaled output.
+#' @param ymin The minimum y value for the scaled output.
+#' @param ymax The maximum y value for the scaled output.
+#' @return A list of parameters.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
@@ -388,20 +417,15 @@ pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale
 	vis <- new.webvis(root=pv.mark(wv=wv, data=data, type=type, paramlist, anchor=anchor))
 	if(render) { render.webvis(wv=(wv + vis)); return(wv + vis) } else vis
 }
-#wv2 <- pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", render=TRUE)
-#unfold.webvis(wv2)
 
-#' Create the final visualization from the webvis object.
+#' Unfolds the visualization tree structure into a flat form.
 #'
-#' \code{unfold.webvis} Renders the visualization from the webvis object.
+#' \code{unfold.webvis} Unfolds the visualization tree structure into a flat form.
 #'
 #' @param wv The webvis object containing the visualization. 
-#' @param vis.name The file name of the output HTML.
-#' @param path The file path to the HTML file. 
-#' @param file.name The file path to the HTML file. 
-#' @param title The file path to the HTML file. 
-#' @param protovis.path The file path to the HTML file.
-#' @return A wv object.
+#' @param name The name of the visualization (will show up as variables in the javascript).
+#' @param parent If the node has a parent (particularly used when function is called recursively).
+#' @return A wv.flat object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
@@ -429,10 +453,14 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #'
 #' \code{plot.webvis} Simplified plot function for web vis plots
 #'
-#' @param data The webvis object containing the visualization. 
-#' @param type The type of plot.  Can be "bar", "line", "area", "pie", "dot", or "..."
+#' @param x Either the "x" axis data or all the data for the visualization (can be vector or dataset). 
+#' @param y Optional, can specify the "y" axis data. 
+#' @param type The type of plot.  Can be "bar", "line", "area", "pie", "dot", or "shape"
 #' @param width The width of the panel in pixels.
 #' @param height The width of the panel in pixels. 
+#' @param add.grid Logical value for whether to add a grid. 
+#' @param add.axes Whether to add x-y axes. 
+#' @param scale.min Whether the y-axis should be scaled to zero or the minimum value in the data 
 #' @return Opens a plot.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
@@ -440,9 +468,18 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
 #' @examples
-#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), "line")
-#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), "area")
-plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=0, ...) {
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="line")
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="area")
+#' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), add.grid=FALSE)
+#' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="area")
+#' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=0)
+#' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
+#' plot.webvis(x=10*rnorm(20), width=500, height=500, type="line")
+#' plot.webvis(x=10*rnorm(20), y=10*rnorm(20), width=500, height=500, type="dot")
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie")
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie", inner.radius=60)
+#' plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
+plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=NULL, ...) {
 	if(is.null(y) && is.vector(x)) {
 		data <- data.frame(y=x, x=1:length(x))
 	} else { data <- data.frame(x=x, y=y) }
@@ -471,26 +508,18 @@ plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=T
 	}
 	render.webvis(wv)
 }
-#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), add.grid=F)
-#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="area")
-#plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
-#plot.webvis(x=1000*rnorm(20), width=500, height=500, type="line", scale.min=NULL)
-#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="line")
-#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="area")
-#plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie")
-#plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
 
-#' Add a panel to the visualization.
+#' Converts R data into Protovis data.
 #'
-#' \code{protovis.data} Adds a panel to the visualization
+#' \code{pv.data} Converts R data into Protovis data.
 #'
-#' @param data The webvis object containing the visualization. 
-#' @return A wv object.
+#' @param data An R data object. 
+#' @param quote Whether characters should be quoted. 
+#' @return A protovis data object.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
-#' @seealso \code{\link{new.webvis}} that creates the webvis object.
 pv.data <- function(data, quote=FALSE) {
 	if(all(data == "null")) return(data)
 	if(is.character(data) && length(data)==1) if(quote) return(collapse("'", data, "'")) else data
@@ -516,7 +545,7 @@ pv.data <- function(data, quote=FALSE) {
 #' @param file.name The file path to the HTML file. 
 #' @param title The file path to the HTML file. 
 #' @param protovis.path The file path to the HTML file.
-#' @return A wv object.
+#' @return The path to the output visualization.
 #' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references

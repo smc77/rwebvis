@@ -14,8 +14,10 @@
 \item{height}{The height of the panel.}
 \item{data}{The data for the panel.}
 \item{data.name}{The name of the variable to be scaled.}
-\item{range.min}{The minimum value for the data to scale.}
-\item{range.max}{The maximum value for the data to scale.}
-\item{scale.min}{The minimum scaled value.}
-\item{scale.max}{The maximum scaled value.}}
+\item{scale.min}{The minimum scaled value (or defaults to zero) in pixels.}
+\item{scale.max}{The maximum scaled value (or defaults to the height/width of the visualization) in pixels.}
+\item{xmin}{The minimum x value for the scaled output.}
+\item{xmax}{The maximum x value for the scaled output.}
+\item{ymin}{The minimum y value for the scaled output.}
+\item{ymax}{The maximum y value for the scaled output.}}
 \examples{pv.scale(type="linear.value.y", width=200, height=200, data=data.frame(value=c(1:5)))}

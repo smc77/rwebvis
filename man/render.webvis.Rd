@@ -4,7 +4,7 @@
 \usage{render.webvis(wv, vis.name, file.name, title="", protovis.path)}
 \description{Create the final visualization from the webvis object.}
 \details{\code{render.webvis} Renders the visualization from the webvis object.}
-\value{A wv object.}
+\value{The path to the output visualization.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}

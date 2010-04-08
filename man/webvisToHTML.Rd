@@ -10,7 +10,7 @@
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
-\arguments{\item{wv}{A webvis object.}
+\arguments{\item{wv}{A webvis.flat object (from the unfold.webvis function()).}
 \item{div.id}{The div tag id.}
 \item{html.wrap}{Whether to wrap the visualization in other supplied HTML.}
 \item{title}{The title of the HTML page.}

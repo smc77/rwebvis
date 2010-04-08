@@ -3,7 +3,8 @@
 \title{Generic function for all Protovis mark types.}
 \usage{pv.mark(wv, type, data, ..., anchor)}
 \description{Generic function for all Protovis mark types.}
-\details{\code{pv.mark} Generic function for all Protovis mark types.}
+\details{\code{pv.mark} Generic function for all Protovis mark types.  This function can be used
+to create any kind of Protovis object regardless of whether it has been exposed separately.}
 \value{A webvis object.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}

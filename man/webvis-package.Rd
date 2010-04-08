@@ -1,6 +1,6 @@
 \name{webvis-package}
 \title{Web graphics for R.}
-\description{Provides web graphics for R by wrapping visualization API's.  Currently supports part of Protovis.}
+\description{Provides web graphics for R by wrapping visualization API's.  Currently supports Protovis.}
 \details{\tabular{ll}{
 Package: \tab webvis\cr
 Type: \tab Package\cr

@@ -41,8 +41,8 @@ wv <- new.webvis(width=150, height=150)
 render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", left.name="x", top.scale="linear.y.y", left.scale="linear.x.x"))
 
 # line example 5
-wv <- new.webvis(width=150, height=150)
-render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
+wv <- pv.panel(width=150, height=150)
+render.webvis(wv + pv.area(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom=0, top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
 
 # line example 7
 wv <- new.webvis(width=150, height=150)

@@ -1,16 +1,23 @@
 \name{append.param}
 \alias{append.param}
-\title{Generic function for all Protovis mark types.}
+\title{Used in pv...}
 \usage{append.param(paramlist, name, value, param.name, param.scale,
     scale.min, scale.max, xmin, xmax, ymin, ymax)}
-\description{Generic function for all Protovis mark types.}
-\details{\code{append.param} Generic function for all Protovis mark types.}
-\value{A webvis object.}
+\description{Used in pv.chart to correctly combine parameters from the input.}
+\details{\code{append.param} Used in pv.chart to correctly combine parameters from the input.  A "value" has a higher priority than
+a name in the data.}
+\value{A list of parameters.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
-\arguments{\item{wv}{A webvis object}
-\item{type}{Can be "Line", "Bar", etc. (see Protovis API)}
-\item{data}{A dataset for plotting.}
-\item{...}{Any number of pv.param objects.}
-\item{anchor}{If anchoring to another object.}}
+\arguments{\item{paramlist}{A list of parameters, to be appended.}
+\item{name}{The name of the Protovis parameter (e.g. "width").}
+\item{value}{A specific value for the parameter (e.g. 200).}
+\item{param.name}{The name of the field in the dataset (if not supplying specific value).}
+\item{param.scale}{The scaling for the parameter.}
+\item{scale.min}{The minimum scaled value (or defaults to zero) in pixels.}
+\item{scale.max}{The maximum scaled value (or defaults to the height/width of the visualization) in pixels.}
+\item{xmin}{The minimum x value for the scaled output.}
+\item{xmax}{The maximum x value for the scaled output.}
+\item{ymin}{The minimum y value for the scaled output.}
+\item{ymax}{The maximum y value for the scaled output.}}

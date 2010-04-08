@@ -22,7 +22,7 @@
 \item{xmax}{}
 \item{scale.min}{}
 \item{...}{The parameters from pv.chart}}
-\examples{plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar", scale.min=0)
+\examples{plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="bar", scale.min=0)
 pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=25, render=TRUE)
 
 pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), width=20, render=TRUE)

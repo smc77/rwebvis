@@ -1,17 +1,14 @@
 \name{unfold.webvis}
 \alias{unfold.webvis}
-\title{Create the final visualization from the webvis object.}
+\title{Unfolds the visualization tree structure into a flat form.}
 \usage{unfold.webvis(wv, name="vis", parent)}
-\description{Create the final visualization from the webvis object.}
-\details{\code{unfold.webvis} Renders the visualization from the webvis object.}
-\value{A wv object.}
+\description{Unfolds the visualization tree structure into a flat form.}
+\details{\code{unfold.webvis} Unfolds the visualization tree structure into a flat form.}
+\value{A wv.flat object.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \seealso{\code{\link{new.webvis}} that creates the webvis object.}
 \arguments{\item{wv}{The webvis object containing the visualization.}
-\item{vis.name}{The file name of the output HTML.}
-\item{path}{The file path to the HTML file.}
-\item{file.name}{The file path to the HTML file.}
-\item{title}{The file path to the HTML file.}
-\item{protovis.path}{The file path to the HTML file.}}
+\item{name}{The name of the visualization (will show up as variables in the javascript).}
+\item{parent}{If the node has a parent (particularly used when function is called recursively).}}

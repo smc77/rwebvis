@@ -84,7 +84,7 @@ pv.line <- function(bottom.name="y", left.name="x", bottom.scale=paste("linear",
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{pv.chart}} that creates the webvis object.
 #' @examples
-#' plot.webvis(data=c(1, 2, 1.5, 3, 1.2), "bar", scale.min=0)
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="bar", scale.min=0)
 #' pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=25, render=TRUE)
 #' 
 #' pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), width=20, render=TRUE)
@@ -171,21 +171,37 @@ pv.area <- function(bottom=0, height.name="y", left.name="x", height.scale=paste
 }
 
 
-#
-# http://code.google.com/p/protovis-js/wiki/PvWedge
-#
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), inner.radius=50, outer.radius=70, angle.name="y", render=TRUE)
-#pv.wedge(data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2), rad=20*(1:7)), inner.radius=50, outer.radius.name="rad", angle.name="y", render=TRUE)
-pv.wedge <- function(wv=pv.panel(), left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, outer.radius=NULL, ...) {
+#' Add a wedge to the visualization (for pie charts, etc).
+#'
+#' \code{pv.wedge} Add a wedge to the visualization (for pie charts, etc).
+#'
+#' @param wv A webvis object (defaults to an empty panel). 
+#' @param left Where the pie chart will be centered w.r.t. the left side of the panel. 
+#' @param bottom Where the pie chart will be centered w.r.t. the bottom of the panel.
+#' @param angle.name The name of the data field which contains the angle of each wedge.
+#' @param inner.radius The inner radius of the chart. 
+#' @param outer.radius The outer radius of the chart (defaults to the width/height). 
+#' @param outer.radius.name The name of a data field for varying radius for each wedge. 
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
+#' @seealso \code{\link{pv.chart}} that creates the webvis object.
+#' @examples
+#' pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
+#' pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), outer.radius=70, angle.name="y", render=TRUE)
+#' pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), inner.radius=50, outer.radius=70, angle.name="y", render=TRUE)
+#' pv.wedge(data=data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2), rad=15*(1:7)), inner.radius=50, outer.radius.name="rad", angle.name="y", render=TRUE)
+pv.wedge <- function(wv=pv.panel(), left=NULL, bottom=NULL, angle.name="y", inner.radius=NULL, outer.radius=NULL, outer.radius.name=NULL, ...) {
 	print(angle.name)
 	panel.width <- wv$width
 	panel.height <- wv$height
 	if(is.null(left)) left <- panel.width/2
 	if(is.null(bottom)) bottom <- panel.height/2
-	if(is.null(outer.radius)) outer.radius <- min(panel.width, panel.height)/2
-	vis <- pv.chart(type="Wedge", left=left, bottom=bottom, angle.name=angle.name, inner.radius=inner.radius, outer.radius=outer.radius, ..., normalize=TRUE)
+	if(is.null(outer.radius) && is.null(outer.radius.name)) outer.radius <- min(panel.width, panel.height)/2
+	vis <- pv.chart(type="Wedge", left=left, bottom=bottom, angle.name=angle.name, inner.radius=inner.radius, outer.radius=outer.radius, outer.radius.name=outer.radius.name, ..., normalize=TRUE)
 	vis
 }
 
