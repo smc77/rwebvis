@@ -375,7 +375,9 @@ pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale
 		size, size.name, size.scale, shape, shape.name, shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, 
 		angle, angle.name, angle.scale, start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, 
 		text, text.name, text.scale, font, text.style, text.align, text.baseline, text.margin, text.angle,  
-		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, scale.min=NULL, scale.max=NULL, anchor=NULL, render=FALSE, normalize=FALSE, ...) {
+		stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented, interpolate, 
+		x.padding, y.padding, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, scale.min=NULL, scale.max=NULL, anchor=NULL, render=FALSE, 
+		url, normalize=FALSE, ...) {
 	if(!esse(wv)) { wv <- pv.panel() }
 	if(esse(data)) {
 		if(is.vector(data))
@@ -413,6 +415,7 @@ pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale
 	paramlist <- append.param(paramlist=paramlist, name="textBaseline", value=text.baseline)
 	paramlist <- append.param(paramlist=paramlist, name="textMargin", value=text.margin)
 	paramlist <- append.param(paramlist=paramlist, name="textAngle", value=text.angle)
+	paramlist <- append.param(paramlist=paramlist, name="url", value=url)
 	# assemble the mark
 	vis <- new.webvis(root=pv.mark(wv=wv, data=data, type=type, paramlist, anchor=anchor))
 	if(render) { render.webvis(wv=(wv + vis)); return(wv + vis) } else vis

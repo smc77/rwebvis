@@ -1,15 +1,14 @@
 \name{pv.wedge}
 \alias{pv.wedge}
 \title{Add a wedge to the visualization (for pie charts, etc).}
-\usage{pv.wedge(wv=pv.panel(), left, bottom, angle.name="y", inner.radius,
-    outer.radius, outer.radius.name, ...)}
+\usage{pv.wedge(wv=pv.panel(), left, bottom, angle.name="y", inner.radius, outer.radius, outer.radius.name, ...)}
 \description{Add a wedge to the visualization (for pie charts, etc).}
 \details{\code{pv.wedge} Add a wedge to the visualization (for pie charts, etc).}
 \value{A wv object.}
 \keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://code.google.com/p/protovis-js/wiki/PvWedge}}
-\seealso{\code{\link{pv.chart}} that creates the webvis object.}
+\seealso{\code{\link{pv.chart}}, a more low-level charting function.}
 \arguments{\item{wv}{A webvis object (defaults to an empty panel).}
 \item{left}{Where the pie chart will be centered w.r.t. the left side of the panel.}
 \item{bottom}{Where the pie chart will be centered w.r.t. the bottom of the panel.}

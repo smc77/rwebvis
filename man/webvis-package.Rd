@@ -4,7 +4,7 @@
 \details{\tabular{ll}{
 Package: \tab webvis\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
+Version: \tab 0.0.1\cr
 Date: \tab 2010-03-22\cr
 License: \tab BSD (>= 2)\cr
 LazyLoad: \tab no\cr

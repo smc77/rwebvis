@@ -1,8 +1,7 @@
 \name{append.param}
 \alias{append.param}
 \title{Used in pv...}
-\usage{append.param(paramlist, name, value, param.name, param.scale,
-    scale.min, scale.max, xmin, xmax, ymin, ymax)}
+\usage{append.param(paramlist, name, value, param.name, param.scale, scale.min, scale.max, xmin, xmax, ymin, ymax)}
 \description{Used in pv.chart to correctly combine parameters from the input.}
 \details{\code{append.param} Used in pv.chart to correctly combine parameters from the input.  A "value" has a higher priority than
 a name in the data.}

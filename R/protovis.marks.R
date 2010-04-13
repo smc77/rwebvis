@@ -188,7 +188,7 @@ pv.area <- function(bottom=0, height.name="y", left.name="x", height.scale=paste
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
-#' @seealso \code{\link{pv.chart}} that creates the webvis object.
+#' @seealso \code{\link{pv.chart}}, a more low-level charting function.
 #' @examples
 #' pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), render=TRUE)
 #' pv.wedge(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), outer.radius=70, angle.name="y", render=TRUE)
@@ -207,6 +207,22 @@ pv.wedge <- function(wv=pv.panel(), left=NULL, bottom=NULL, angle.name="y", inne
 
 
 
+#' Add a dot to the visualization.
+#'
+#' \code{pv.dot} Add a dot to the visualization.
+#'
+#' @param bottom.name The name of the field in the supplied data frame or vector. 
+#' @param left.name The name of the field in the supplied data frame or vector. 
+#' @param bottom.scale The name of the field in the supplied data frame or vector. 
+#' @param left.scale The name of the field in the supplied data frame or vector. 
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
+#' @seealso \code{\link{pv.chart}}, a more low-level charting function.
+#' @examples
 #' wv <- new.webvis(width=150, height=150)
 #' render.webvis(wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), ymax=140, xmax=140, xmin=10, ymin=10, scale.min=0))
 pv.dot <- function(left.name="x", bottom.name="y", bottom.scale=paste("linear", bottom.name, "y", sep="."), left.scale=paste("linear", left.name, "x", sep="."), ...) {
@@ -214,22 +230,58 @@ pv.dot <- function(left.name="x", bottom.name="y", bottom.scale=paste("linear", 
 	vis
 }
 
-pv.shape <- function(...) {
-	vis <- pv.chart(type="Shape", ...)
+#' Add an image to the visualization.
+#'
+#' \code{pv.image} Add an image to the visualization.
+#'
+#' @param url The url for the image to be displayed. 
+#' @param bottom.name The name of the field in the supplied data frame or vector. 
+#' @param left.name The name of the field in the supplied data frame or vector. 
+#' @param bottom.scale The name of the field in the supplied data frame or vector. 
+#' @param left.scale The name of the field in the supplied data frame or vector. 
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
+#' @seealso \code{\link{pv.chart}}, a more low-level charting function.
+#' @examples
+#' wv <- pv.panel(width=150, height=150)
+#' render.webvis(wv + pv.image(url="http://vis.stanford.edu/protovis/ex/stanford.png", left.name=NULL, bottom.name=NULL))
+#' pv.image(url="http://vis.stanford.edu/protovis/ex/stanford.png", width=100, height=100, left.name=NULL, bottom.name=NULL, render=TRUE)
+#' pv.image(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), url="http://vis.stanford.edu/protovis/ex/stanford.png", width=50, height=50, render=TRUE)
+pv.image <- function(url=NULL, left.name="x", bottom.name="y", bottom.scale=paste("linear", bottom.name, "y", sep="."), left.scale=paste("linear", left.name, "x", sep="."), ...) {
+	vis <- pv.chart(type="Image", url=url, left.name=left.name, bottom.name=bottom.name, bottom.scale=bottom.scale, left.scale=left.scale, ...)
 	vis
 }
 
-pv.image <- function(...) {
-	vis <- pv.chart(type="Image", ...)
-	vis
-}
 
-#data <- data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
-#wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
-#wv <- wv + (pv.rule(wv=wv, data=data, axis="y", stroke.style="rgba(128,128,128,.2)", scale.min=0) + pv.label(anchor="right", text.name="y"))
-#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
-#wv <- wv + pv.line(wv=wv, data=data, scale.min=0)
-#render.webvis(wv)
+#' Add an rule to the visualization.
+#'
+#' \code{pv.rule} Add an rule to the visualization.
+#'
+#' @param axis can be either "x" or "y"
+#' @param left an exact position w.r.t. the left side of the panel
+#' @param bottom an exact position w.r.t. the bottom side of the panel
+#' @param bottom.name The name of the field in the supplied data frame or vector. 
+#' @param left.name The name of the field in the supplied data frame or vector. 
+#' @param bottom.scale The name of the field in the supplied data frame or vector. 
+#' @param left.scale The name of the field in the supplied data frame or vector. 
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
+#' @seealso \code{\link{pv.chart}}, a more low-level charting function.
+#' @examples
+#' data <- data.frame(y=c(1, 1.2, 1.7, 1.5, .7, .5, .2))
+#' wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
+#' wv <- wv + (pv.rule(wv=wv, data=data, axis="y", stroke.style="rgba(128,128,128,.2)", scale.min=0) + pv.label(anchor="right", text.name="y"))
+#' wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+#' wv <- wv + pv.line(wv=wv, data=data, scale.min=0)
+#' render.webvis(wv)
 pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom.name, bottom.scale, ...) {
 	if(!is.null(axis)) {
 		if(axis=="x" && !esse(left) && !esse(left.name)) {
@@ -244,11 +296,25 @@ pv.rule <- function(axis=NULL, data, left, left.name, left.scale, bottom, bottom
 	vis
 }
 
-#wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
-#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="right", text.name="y"))
-#wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
-#wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
-#render.webvis(wv)
+#' Add a label to the visualization.
+#'
+#' \code{pv.label} Add a label to the visualization.
+#'
+#' @param text The text for the label.
+#' @param text.name The name of the column from supplied data.
+#' @param ... The parameters from pv.chart 
+#' @return A wv object.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://code.google.com/p/protovis-js/wiki/PvWedge}
+#' @seealso \code{\link{pv.chart}}, a more low-level charting function.
+#' @examples
+#' wv <- pv.panel(width=300, height=200, left=20, top=20, right=20, bottom=20)
+#' wv <- wv + (pv.rule(wv=wv, data=1:10, axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="right", text.name="y"))
+#' wv <- wv + (pv.rule(wv=wv, data=1:10, axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+#' wv <- wv + pv.dot(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), scale.min=0)
+#' render.webvis(wv)
 pv.label <- function(text, text.name, ...) {
 	vis <- pv.chart(type="Label", text=text, text.name=text.name, ...)
 	vis
