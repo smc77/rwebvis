@@ -5,7 +5,7 @@
 \description{Unfolds the visualization tree structure into a flat form.}
 \details{\code{unfold.webvis} Unfolds the visualization tree structure into a flat form.}
 \value{A wv.flat object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \seealso{\code{\link{new.webvis}} that creates the webvis object.}

@@ -6,7 +6,7 @@
 \details{\code{pv.mark} Generic function for all Protovis mark types.  This function can be used
 to create any kind of Protovis object regardless of whether it has been exposed separately.}
 \value{A webvis object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{wv}{A webvis object}

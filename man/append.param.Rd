@@ -7,7 +7,7 @@
 \details{\code{append.param} Used in pv.chart to correctly combine parameters from the input.  A "value" has a higher priority than
 a name in the data.}
 \value{A list of parameters.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{paramlist}{A list of parameters, to be appended.}

@@ -6,7 +6,7 @@
 \description{Add a wedge to the visualization (for pie charts, etc).}
 \details{\code{pv.wedge} Add a wedge to the visualization (for pie charts, etc).}
 \value{A wv object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://code.google.com/p/protovis-js/wiki/PvWedge}}
 \seealso{\code{\link{pv.chart}}, a more low-level charting function.}

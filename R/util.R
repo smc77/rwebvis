@@ -16,7 +16,6 @@
 #'
 #' @param x The object to be checked.
 #' @return A logical value.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis <- function(x) class(x) == "webvis"
 
@@ -26,7 +25,6 @@ is.webvis <- function(x) class(x) == "webvis"
 #'
 #' @param x The object to be checked.
 #' @return A logical value.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis.flat <- function(x) class(x) == "webvis.flat"
 
@@ -36,7 +34,6 @@ is.webvis.flat <- function(x) class(x) == "webvis.flat"
 #'
 #' @param x The object to be checked.
 #' @return A logical value.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis.param <- function(x) class(x) == "webvis.param"
 
@@ -46,7 +43,6 @@ is.webvis.param <- function(x) class(x) == "webvis.param"
 #'
 #' @param x The object to be checked.
 #' @return A logical value.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 esse <- function(x) {
 	if(missing(x)) 
@@ -72,7 +68,6 @@ esse <- function(x) {
 #'
 #' @param ... Comma separated list of values.
 #' @return A string of the values combined.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @examples
 #' collapse("a", "b", "c")
@@ -84,7 +79,6 @@ collapse <- function(...) paste(c(...), collapse="")
 #'
 #' @param t The tail html.
 #' @return HTML.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 getTail <- function(t) {
 	if(!esse(t)) t <- "</body></html>"
@@ -98,7 +92,6 @@ getTail <- function(t) {
 #' @param title The title of the page.
 #' @param protovis.path The path (url) for protovis.
 #' @return HTML.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
 	h <- paste("<html>
@@ -118,7 +111,6 @@ getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
 #' @param field The field name.
 #' @param data The data to be checked.
 #' @return A logical value.
-#' @keywords graphics
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 field.exists <- function(field, data) {
 	if(!esse(data)) FALSE

@@ -5,7 +5,7 @@
 \description{Add a dataset as a variable to the visualization.}
 \details{\code{pv.dataset} Add a dataset as a variable to the visualization.}
 \value{A string of the relevant javascript.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{data}{The dataset to be used in the graphic.}

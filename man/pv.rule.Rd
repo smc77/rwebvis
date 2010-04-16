@@ -6,11 +6,12 @@
 \description{Add an rule to the visualization.}
 \details{\code{pv.rule} Add an rule to the visualization.}
 \value{A wv object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://code.google.com/p/protovis-js/wiki/PvWedge}}
 \seealso{\code{\link{pv.chart}}, a more low-level charting function.}
 \arguments{\item{axis}{can be either "x" or "y"}
+\item{data}{The data to be used in the function.}
 \item{left}{an exact position w.r.t. the left side of the panel}
 \item{bottom}{an exact position w.r.t. the bottom side of the panel}
 \item{bottom.name}{The name of the field in the supplied data frame or vector.}

@@ -2,11 +2,11 @@
 \alias{new.webvis}
 \title{Create a new webvis object to store each layer of the visualization.}
 \usage{new.webvis(name="vis", description, width=300, height=200, dataset,
-    root, branch=list(), render, ...)}
+    root, branch=list(), render)}
 \description{Create a new webvis object to store each layer of the visualization.}
 \details{\code{new.webvis} Create a new webvis object to store each layer of the visualization.}
 \value{A webvis object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{width}{The width in pixels.}

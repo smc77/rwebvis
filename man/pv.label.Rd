@@ -5,7 +5,7 @@
 \description{Add a label to the visualization.}
 \details{\code{pv.label} Add a label to the visualization.}
 \value{A wv object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://code.google.com/p/protovis-js/wiki/PvWedge}}
 \seealso{\code{\link{pv.chart}}, a more low-level charting function.}

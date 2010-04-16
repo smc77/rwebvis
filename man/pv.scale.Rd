@@ -6,7 +6,7 @@
 \description{A scaling function for protovis.}
 \details{\code{pv.scale} A scaling function for protovis.}
 \value{The HTML output}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{type}{The type is a "." separated string which determines whether the scaling is linear, log, or ..., and what parameter should be scaled.}

@@ -101,12 +101,21 @@ wv <- wv + wg
 
 wv <- wv + pv.label(left=130, bottom=31, font="italic 10px serif", text="Weekly Wages of a Good Mechanic")
 
+# y-axis
 wr <- pv.rule(bottom=-0.5)
-wr2 <- pv.rule(wv=wv, data=data.frame(y=seq(0,100,10)), bottom=0, height.name="y", height.scale="linear.y.y", ymin=0, ymax=100, stroke.style="rgba(255, 255, 255, .2)")
+wr2 <- pv.rule(wv=wv, data=data.frame(y=seq(0,100,10)), bottom.name="y", bottom.scale="linear.y.y", ymin=0, stroke.style="rgba(255, 255, 255, .2)")
 wr2 <- wr2 + pv.label(anchor="right", text.name="y")
 wr <- wr + wr2
 wv <- wv + wr
 
+# x-axis
+wr <- pv.rule(wv=wv, data=data.frame(y=seq(1560, 1830, 10)), bottom=0, left.scale="linear.y.x", left.name="y", height=-4)
+wr2 <- pv.rule(wv=wv, data=data.frame(y=seq(1600, 1850, 50)), height="null", top=0, left.name="y", left.scale="linear.y.x", stroke.style="rgba(0, 0, 0, .2)")
+wr2 <- wr2 + pv.label(anchor="bottom", text.name="y", text.margin=8)
+wr <- wr + wr2
+wv <- wv + wr
+
+# Example of using the pv.mark() function to create a custom object.
 monarch2 <- monarch
 monarch2$top <- ifelse(monarch2$commonwealth == 0 & as.numeric(rownames(monarch2)) %% 2 == 0, 15, 10)
 monarch2$fill <- ifelse(monarch2$commonwealth == 0, "'#000'", "'#fff'")

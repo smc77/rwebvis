@@ -5,6 +5,5 @@
 \description{Checks whether something is a webvis object.}
 \details{\code{is.webvis} Checks whether something is a webvis object.}
 \value{A logical value.}
-\keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \arguments{\item{x}{The object to be checked.}}

@@ -5,7 +5,7 @@
 \description{Converts R data into Protovis data.}
 \details{\code{pv.data} Converts R data into Protovis data.}
 \value{A protovis data object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{data}{An R data object.}

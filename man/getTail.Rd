@@ -5,6 +5,5 @@
 \description{Return the tail html.}
 \details{\code{getTail} Return the tail html.}
 \value{HTML.}
-\keyword{graphics}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \arguments{\item{t}{The tail html.}}

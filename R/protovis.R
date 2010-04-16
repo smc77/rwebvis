@@ -21,7 +21,9 @@
 #' LazyLoad: \tab no\cr
 #' }
 #'
-#' Uses Protovis to provide web graphics for R.
+#' Uses Protovis to provide web graphics for R.  Package is still under active development and shouldn't be considered
+#' stable until version 0.1.  Currently uses a web browser to process JavaScript, although future version will process 
+#' JavaScript directly and return the SVG output.
 #' 
 #' @name webvis-package
 #' @aliases webvis
@@ -41,7 +43,7 @@ NULL
 #' @param parent The root node.
 #' @param child The leaf node.
 #' @return A webvis object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -70,13 +72,13 @@ NULL
 #' @param branch A node layer underneath the root visualization.
 #' @param render The render command for the given visualization.
 #' @return A webvis object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @examples
 #' new.webvis()
-new.webvis <- function(name="vis", description=NULL, width=300, height=200, dataset=NULL, root=NULL, branch=list(), render=NULL, ...) {
+new.webvis <- function(name="vis", description=NULL, width=300, height=200, dataset=NULL, root=NULL, branch=list(), render=NULL) {
 	wv <- list(name=name,
 		description=description, 
 		width=width,
@@ -101,7 +103,7 @@ new.webvis <- function(name="vis", description=NULL, width=300, height=200, data
 #' @param tail The HTML below the webvis.
 #' @param protovis.path The path to the protovis javascript.
 #' @return The HTML output
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -139,7 +141,7 @@ webvisToHTML <- function(wv, div.id="id", html.wrap=TRUE, title=NULL, head=getHe
 #' @param default The default value for the parameter.
 #' @param quote Whether character values should be quoted.
 #' @return A webvis.param object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -169,7 +171,7 @@ pv.param <- function(name, data=NULL, data.name=NULL, value=NULL, scale=NULL, sc
 #' @param ymin The minimum y value for the scaled output.
 #' @param ymax The maximum y value for the scaled output.
 #' @return The HTML output
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -196,7 +198,7 @@ pv.scale <- function(type, width, height, data=NULL, data.name=NULL, scale.min=N
 #' @param wv A webvis object.
 #' @param data A dataset.
 #' @return The HTML output
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -239,8 +241,9 @@ pv.parse <- function(param, wv, data) {
 #' @param right Where the panel should start with respect to the right of the window.
 #' @param bottom Where the panel should start with respect to the bottom of the window.
 #' @param top Where the panel should start with respect to the top of the window.
+#' @param anchor Whether the panel should be anchored to the parent object.
 #' @return The HTML output
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -271,7 +274,7 @@ pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, 
 #' @param data The dataset to be used in the graphic.
 #' @param name
 #' @return A string of the relevant javascript.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -292,7 +295,7 @@ pv.dataset <- function(data, name) {
 #' @param ... Any number of pv.param objects.
 #' @param anchor If anchoring to another object.
 #' @return A webvis object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -333,7 +336,7 @@ pv.mark <- function(wv=NULL, type, data=NULL, ..., anchor=NULL) {
 #' @param ymin The minimum y value for the scaled output.
 #' @param ymax The maximum y value for the scaled output.
 #' @return A list of parameters.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -346,12 +349,78 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 	paramlist
 }
 
-#' Add a line to the visualization.
+#' Add a chart to the visualization.
 #'
-#' \code{pv.line} Adds a line plot to the visualization
+#' \code{pv.chart} Adds a chart to the visualization.  This is the core charting function which all other charting functions reference.
+#' Function is generally not used directly, but is called by the higher level functions (e.g. pv.line, pv.dot).  
 #'
+#' @param type The type of chart (can be "Line", "Bar", "Dot", "Image", "Area") 
 #' @param wv The webvis object containing the visualization. 
 #' @param data The webvis object containing the visualization. 
+#' @param bottom.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param bottom.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param top.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param top.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param left.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param left.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param right.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param right.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param height A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param height.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param height.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param width   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param width.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param width.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param line.width.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param line.width.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param size A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param size.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param size.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param shape   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param shape.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param shape.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param inner.radius A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param inner.radius.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param inner.radius.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param outer.radius A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param outer.radius.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param outer.radius.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param angle   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param angle.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param angle.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param start.angle   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param start.angle.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param start.angle.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param end.angle   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param end.angle.name A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param end.angle.scale   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param font A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.style A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.align A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.baseline   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.margin   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param text.angle A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param stroke.style.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param stroke.style.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param fill.style.name   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param fill.style.scale A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param segmented   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param x.padding   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param y.padding   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param xmin A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param xmax A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param ymin A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param ymax A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param scale.min   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param scale.max   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param anchor A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param render A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param url   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param normalize   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
+#' @param ...   A protovis mark parameter (see API documentation http://protovis-js.googlecode.com/svn/trunk/jsdoc/index.html).
 #' @param bottom The width of the panel in pixels.
 #' @param top The width of the panel in pixels.
 #' @param left The width of the panel in pixels.
@@ -360,16 +429,12 @@ append.param <- function(paramlist, name, value, param.name, param.scale, scale.
 #' @param stroke.style The width of the panel in pixels.
 #' @param fill.style The width of the panel in pixels.
 #' @param interpolate The width of the panel in pixels.
-#' @param spacing The width of the panel in pixels. 
-#' @param equal.spacing The width of the panel in pixels.
 #' @return A wv object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
 #' @seealso \code{\link{new.webvis}} that creates the webvis object.
-#' @examples
-#' pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x")
 pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, 
 		height, height.name, height.scale, width, width.name, width.scale, line.width, line.width.name, line.width.scale, 
 		size, size.name, size.scale, shape, shape.name, shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, 
@@ -429,7 +494,7 @@ pv.chart <- function(type, wv=NULL, data=NULL, bottom, bottom.name, bottom.scale
 #' @param name The name of the visualization (will show up as variables in the javascript).
 #' @param parent If the node has a parent (particularly used when function is called recursively).
 #' @return A wv.flat object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -464,8 +529,9 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' @param add.grid Logical value for whether to add a grid. 
 #' @param add.axes Whether to add x-y axes. 
 #' @param scale.min Whether the y-axis should be scaled to zero or the minimum value in the data 
-#' @return Opens a plot.
-#' @keywords graphics
+#' @param ... Other parmaeters for pv.chart.
+#' @return Opens a plot in a browser window.
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -478,17 +544,17 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 #' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=0)
 #' plot.webvis(c(1, 2, 1.5, 3, 1.2, 1.7, 2.5, 6, 5), type="line", scale.min=NULL)
 #' plot.webvis(x=10*rnorm(20), width=500, height=500, type="line")
-#' plot.webvis(x=10*rnorm(20), y=10*rnorm(20), width=500, height=500, type="dot")
+#' plot.webvis(x=100*rnorm(20), y=100*rnorm(20), width=500, height=500, type="dot")
 #' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie")
-#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie", inner.radius=60)
+#' plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="pie", inner.radius=80)
 #' plot.webvis(x=1:5, y=c(1, 2, 1.5, 3, 1.2), type="area")
-plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=NULL, ...) {
+plot.webvis <- function(x, y=NULL, type="dot", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min=NULL, ...) {
 	if(is.null(y) && is.vector(x)) {
 		data <- data.frame(y=x, x=1:length(x))
 	} else { data <- data.frame(x=x, y=y) }
 	wv <- pv.panel(width=width+50, height=height+50, left=50, bottom=50, right=50, top=50)
 	wv <- if(type=="bar") {
-		wv + pv.bar(wv=wv, data=data, ...)
+		wv + pv.bar(wv =wv, data=data, ...)
 	} else if(type=="line") {
 		wv + pv.line(wv=wv, data=data, scale.min=scale.min, ...)
 	} else if(type=="dot") {
@@ -500,9 +566,8 @@ plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=T
 	}
 	if(type!="pie") {
 		if(add.grid) {
-			#print(as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))))
-			wv <- wv + (pv.rule(wv=wv, data=as.numeric(sprintf("%1.01f", seq(if(is.null(scale.min)) min(data$y) else scale.min, max(data$y), (max(data$y)/(nrow(data)/2))))), axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="left", text.name="y"))
-			wv <- wv + (pv.rule(wv=wv, data=data.frame(x=as.numeric(sprintf("%.1f", seq(min(data$x), max(data$x), (max(data$x)/(nrow(data)/2)))))), axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x"))
+			wv <- wv + (pv.rule(wv=wv, data=as.numeric(sprintf("%1.02f", seq(if(!esse(scale.min)) min(data$y) else scale.min, max(data$y), length.out=(height/20)))), axis="y", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="left", text.name="y"))
+			wv <- wv + (pv.rule(wv=wv, data=data.frame(x=as.numeric(sprintf("%.2f", seq(min(data$x), max(data$x), length.out=(width/20))))), axis="x", stroke.style="rgba(128,128,128,.2)") + pv.label(anchor="bottom", text.name="x", text.angle=-pi/4, text.align="right"))
 		}
 		if(add.axes) {
 			wv <- wv + pv.rule(wv=wv, bottom=0)
@@ -519,7 +584,7 @@ plot.webvis <- function(x, y=NULL, type="bar", width=300, height=200, add.grid=T
 #' @param data An R data object. 
 #' @param quote Whether characters should be quoted. 
 #' @return A protovis data object.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}
@@ -549,7 +614,7 @@ pv.data <- function(data, quote=FALSE) {
 #' @param title The file path to the HTML file. 
 #' @param protovis.path The file path to the HTML file.
 #' @return The path to the output visualization.
-#' @keywords graphics
+#' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
 #' @references
 #' \url{http://vis.stanford.edu/protovis/}

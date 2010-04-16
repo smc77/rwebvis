@@ -6,7 +6,7 @@
 \description{A protovis mark parameter.}
 \details{\code{pv.param} A protovis mark parameter.}
 \value{A webvis.param object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{name}{The name of mark parameter.}

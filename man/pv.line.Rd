@@ -6,7 +6,7 @@
 \description{Add a line to the visualization.}
 \details{\code{pv.line} Adds a line plot to the visualization}
 \value{A wv object.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \seealso{\code{\link{pv.chart}} that creates the webvis object.}
@@ -25,23 +25,23 @@ pv.line(data=data.frame(z=c(1, 1.2, 1.7, 1.5, .7, .5, .2)), bottom.name="z", ren
 pv.line(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale=NULL, left.scale="linear.x.x", render=TRUE)
 
 # line example 1 (using layers)
-wv <- new.webvis(width=150, height=150)
+wv <- pv.panel(width=150, height=150)
 render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x"))
 
 # line example 2 (need to make sure that it doesn't go over the edge
-wv <- new.webvis(width=150, height=150)
-wv <- wv + (new.webvis(wv=wv, root=pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x"))
+wv <- pv.panel(width=150, height=150)
+wv <- wv + (pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x")
 + pv.dot())
 render.webvis(wv)
 
 # line example 4
-wv <- new.webvis(width=150, height=150)
+wv <- pv.panel(width=150, height=150)
 render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", left.name="x", top.scale="linear.y.y", left.scale="linear.x.x"))
 
 # line example 5
-wv <- new.webvis(width=150, height=150)
+wv <- pv.panel(width=150, height=150)
 render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), top.name="y", right.name="x", top.scale="linear.y.y", right.scale="linear.x.x"))
 
 # line example 7
-wv <- new.webvis(width=150, height=150)
+wv <- pv.panel(width=150, height=150)
 render.webvis(wv + pv.line(wv=wv, data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), bottom.name="y", left.name="x", bottom.scale="linear.y.y", left.scale="linear.x.x", interpolate="step-after"))}

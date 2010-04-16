@@ -7,7 +7,7 @@
 \description{Convert webvis to HTML.}
 \details{\code{webvisToHTML} Convert webvis to HTML.}
 \value{The HTML output}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{wv}{A webvis.flat object (from the unfold.webvis function()).}

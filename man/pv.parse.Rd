@@ -5,7 +5,7 @@
 \description{Takes a parameter and a webvis object and parses them.}
 \details{\code{pv.parse} Takes a parameter and a webvis object and parses them.}
 \value{The HTML output}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{param}{A webvis param object from pv.param().}

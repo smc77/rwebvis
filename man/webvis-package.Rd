@@ -10,7 +10,9 @@ License: \tab BSD (>= 2)\cr
 LazyLoad: \tab no\cr
 }
 
-Uses Protovis to provide web graphics for R.}
+Uses Protovis to provide web graphics for R.  Package is still under active development and shouldn't be considered
+stable until version 0.1.  Currently uses a web browser to process JavaScript, although future version will process 
+JavaScript directly and return the SVG output.}
 \alias{webvis}
 \docType{package}
 \author{Shane Conway \email{shane.conway@gmail.com}}

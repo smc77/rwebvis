@@ -5,7 +5,7 @@
 \description{Create the final visualization from the webvis object.}
 \details{\code{render.webvis} Renders the visualization from the webvis object.}
 \value{The path to the output visualization.}
-\keyword{graphics}
+\keyword{hplot}
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \seealso{\code{\link{new.webvis}} that creates the webvis object.}
