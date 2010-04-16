@@ -1,8 +1,10 @@
 \name{pv.area}
 \alias{pv.area}
 \title{Add a bar to the visualization.}
-\usage{pv.area(bottom=0, height.name="y", left.name="x", height.scale=paste("linear", height.name, "y", sep = "."),
-    left.scale=paste("linear", left.name, "x", sep = "."), scale.min=0, ...)}
+\usage{pv.area(bottom=0, height.name="y", left.name="x",
+    height.scale=paste("linear", height.name, "y", sep = "."),
+    left.scale=paste("linear", left.name, "x", sep = "."), scale.min=0,
+    ...)}
 \description{Add a bar to the visualization.}
 \details{\code{pv.area} Adds a bar plot to the visualization}
 \value{A wv object.}

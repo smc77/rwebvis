@@ -10,10 +10,44 @@
 #
 ###############################################################################
 
+#' Checks whether something is a webvis object.
+#'
+#' \code{is.webvis} Checks whether something is a webvis object.
+#'
+#' @param x The object to be checked.
+#' @return A logical value.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis <- function(x) class(x) == "webvis"
+
+#' Checks whether something is a webvis.flat object.
+#'
+#' \code{is.webvis.flat} Checks whether something is a webvis.flat object.
+#'
+#' @param x The object to be checked.
+#' @return A logical value.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis.flat <- function(x) class(x) == "webvis.flat"
+
+#' Checks whether something is a webvis.param object.
+#'
+#' \code{is.webvis.param} Checks whether something is a webvis.param object.
+#'
+#' @param x The object to be checked.
+#' @return A logical value.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 is.webvis.param <- function(x) class(x) == "webvis.param"
 
+#' Checks whether something exists.
+#'
+#' \code{esse} Checks whether something exists.
+#'
+#' @param x The object to be checked.
+#' @return A logical value.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 esse <- function(x) {
 	if(missing(x)) 
 		return(FALSE)
@@ -44,11 +78,28 @@ esse <- function(x) {
 #' collapse("a", "b", "c")
 collapse <- function(...) paste(c(...), collapse="")
 
-getTail <- function() {
-	t <- "</body></html>"
+#' Return the tail html.
+#'
+#' \code{getTail} Return the tail html.
+#'
+#' @param t The tail html.
+#' @return HTML.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+getTail <- function(t) {
+	if(!esse(t)) t <- "</body></html>"
 	return(t)
 }
 
+#' Return the head html.
+#'
+#' \code{getHead} Return the head html.
+#'
+#' @param title The title of the page.
+#' @param protovis.path The path (url) for protovis.
+#' @return HTML.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
 	h <- paste("<html>
 					<head>
@@ -60,6 +111,15 @@ getHead <- function(title="", protovis.path=PROTOVIS.PATH) {
 	return(h)
 }
 
+#' Checks whether a field exists in a dataset.
+#'
+#' \code{field.exists} Checks whether a field exists in a dataset.
+#'
+#' @param field The field name.
+#' @param data The data to be checked.
+#' @return A logical value.
+#' @keywords graphics
+#' @author Shane Conway \email{shane.conway@@gmail.com}
 field.exists <- function(field, data) {
 	if(!esse(data)) FALSE
 	if(!missing(data)) if(is.data.frame(data)) { if(any(field %in% colnames(data))) return(TRUE) } else { stop("data should be a data.frame")}

@@ -1,8 +1,9 @@
 \name{webvisToHTML}
 \alias{webvisToHTML}
 \title{Convert webvis to HTML.}
-\usage{webvisToHTML(wv, div.id="id", html.wrap=TRUE, title, head=getHead(title = title, protovis.path = protovis.path),
-    tail=getTail(), protovis.path)}
+\usage{webvisToHTML(wv, div.id="id", html.wrap=TRUE, title, head=getHead(title
+    = title, protovis.path = protovis.path), tail=getTail(),
+    protovis.path)}
 \description{Convert webvis to HTML.}
 \details{\code{webvisToHTML} Convert webvis to HTML.}
 \value{The HTML output}

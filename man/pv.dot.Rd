@@ -1,8 +1,9 @@
 \name{pv.dot}
 \alias{pv.dot}
 \title{Add a dot to the visualization.}
-\usage{pv.dot(left.name="x", bottom.name="y", bottom.scale=paste("linear", bottom.name, "y", sep = "."),
-    left.scale=paste("linear", left.name, "x", sep = "."), ...)}
+\usage{pv.dot(left.name="x", bottom.name="y", bottom.scale=paste("linear",
+    bottom.name, "y", sep = "."), left.scale=paste("linear", left.name,
+    "x", sep = "."), ...)}
 \description{Add a dot to the visualization.}
 \details{\code{pv.dot} Add a dot to the visualization.}
 \value{A wv object.}

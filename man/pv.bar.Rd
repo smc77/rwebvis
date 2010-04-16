@@ -1,8 +1,9 @@
 \name{pv.bar}
 \alias{pv.bar}
 \title{Add a bar to the visualization.}
-\usage{pv.bar(height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width,
-    width.name, xmax, scale.min=0, ...)}
+\usage{pv.bar(height.name="y", left.name="x", height.scale="linear.y.y",
+    left.scale="linear.x.x", bottom=0, width, width.name, xmax,
+    scale.min=0, ...)}
 \description{Add a bar to the visualization.}
 \details{\code{pv.bar} Adds a bar plot to the visualization}
 \value{A wv object.}

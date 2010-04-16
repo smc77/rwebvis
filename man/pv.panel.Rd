@@ -1,7 +1,8 @@
 \name{pv.panel}
 \alias{pv.panel}
 \title{A protovis panal.}
-\usage{pv.panel(wv, data, width=300, height=200, left, right, bottom, top, anchor)}
+\usage{pv.panel(wv, data, width=300, height=200, left, right, bottom, top,
+    anchor)}
 \description{A protovis panal.}
 \details{\code{pv.panel} A protovis panal.}
 \value{The HTML output}

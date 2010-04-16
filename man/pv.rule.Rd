@@ -1,7 +1,8 @@
 \name{pv.rule}
 \alias{pv.rule}
 \title{Add an rule to the visualization.}
-\usage{pv.rule(axis, data, left, left.name, left.scale, bottom, bottom.name, bottom.scale, ...)}
+\usage{pv.rule(axis, data, left, left.name, left.scale, bottom, bottom.name,
+    bottom.scale, ...)}
 \description{Add an rule to the visualization.}
 \details{\code{pv.rule} Add an rule to the visualization.}
 \value{A wv object.}
