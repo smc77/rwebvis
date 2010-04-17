@@ -12,6 +12,8 @@
 #
 ###############################################################################
 
+
+# Create the monarchy data
 monarch <- read.csv(con <- textConnection(
 "name, start, end, commonwealth
 Elizabeth, 1565, 1603, 0
@@ -29,6 +31,7 @@ George IV, 1820, 1821, 0"), header=TRUE, as.is=TRUE)
 close(con)
 monarch$name <- sapply(monarch$name, function(x) collapse("'", x, "'"))
 
+# Create the wheat data
 wheat <- read.csv(con <- textConnection(
 				"year, wheat, wages
 						1565, 41, 5
@@ -88,6 +91,7 @@ close(con)
 wheat$wages <- as.numeric(wheat$wages)
 #save(monarch, wheat, file="c:/Programming/src/R/webvis/data/pw.demo.Rda")
 
+# Produce the chart for the wheat/wages data
 wv <- pv.panel(right=60, top=20, bottom=20, width=800, height=445)
 
 wt <- pv.area(wv=wv, data=wheat, interpolate="step-after", height.name="wheat", left.name="year", left.scale="linear.year.x", ymin=0, fill.style="#aaa", stroke.style="#999", scale.min=0)
@@ -137,4 +141,5 @@ vm <- vm + pv.mark(wv=wv, data=monarch2, type="Label",
 		anchor="center")
 wv2 <- wv + vm
 
+# Render the output with a browser
 render.webvis(wv=wv2, vis.name="playfairs_wheat")
