@@ -1,8 +1,7 @@
 \name{pv.wedge}
 \alias{pv.wedge}
 \title{Add a wedge to the visualization (for pie charts, etc).}
-\usage{pv.wedge(wv=pv.panel(), left, bottom, angle.name="y", inner.radius,
-    outer.radius, outer.radius.name, ...)}
+\usage{pv.wedge(wv=pv.panel(), left, bottom, angle.name="y", inner.radius, outer.radius, outer.radius.name, ...)}
 \description{Add a wedge to the visualization (for pie charts, etc).}
 \details{\code{pv.wedge} Add a wedge to the visualization (for pie charts, etc).}
 \value{A wv object.}

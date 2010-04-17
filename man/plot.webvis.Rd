@@ -1,8 +1,7 @@
 \name{plot.webvis}
 \alias{plot.webvis}
 \title{Simplified plot function for web vis plots.}
-\usage{plot.webvis(x, y, type="dot", width=300, height=200, add.grid=TRUE,
-    add.axes=TRUE, scale.min, ...)}
+\usage{plot.webvis(x, y, type="dot", width=300, height=200, add.grid=TRUE, add.axes=TRUE, scale.min, ...)}
 \description{Simplified plot function for web vis plots.}
 \details{\code{plot.webvis} Simplified plot function for web vis plots}
 \value{Opens a plot in a browser window.}

@@ -1,21 +1,12 @@
 \name{pv.chart}
 \alias{pv.chart}
 \title{Add a chart to the visualization.}
-\usage{pv.chart(type, wv, data, bottom, bottom.name, bottom.scale, top,
-    top.name, top.scale, left, left.name, left.scale, right,
-    right.name, right.scale, height, height.name, height.scale, width,
-    width.name, width.scale, line.width, line.width.name,
-    line.width.scale, size, size.name, size.scale, shape, shape.name,
-    shape.scale, inner.radius, inner.radius.name, inner.radius.scale,
-    outer.radius, outer.radius.name, outer.radius.scale, angle,
-    angle.name, angle.scale, start.angle, start.angle.name,
-    start.angle.scale, end.angle, end.angle.name, end.angle.scale,
-    text, text.name, text.scale, font, text.style, text.align,
-    text.baseline, text.margin, text.angle, stroke.style,
-    stroke.style.name, stroke.style.scale, fill.style, fill.style.name,
-    fill.style.scale, segmented, interpolate, x.padding, y.padding,
-    xmin, xmax, ymin, ymax, scale.min, scale.max, anchor, render=FALSE,
-    url, normalize=FALSE, ...)}
+\usage{pv.chart(type, wv, data, bottom, bottom.name, bottom.scale, top, top.name, top.scale, left, left.name, left.scale, right, right.name, right.scale, height,
+    height.name, height.scale, width, width.name, width.scale, line.width, line.width.name, line.width.scale, size, size.name, size.scale, shape, shape.name,
+    shape.scale, inner.radius, inner.radius.name, inner.radius.scale, outer.radius, outer.radius.name, outer.radius.scale, angle, angle.name, angle.scale,
+    start.angle, start.angle.name, start.angle.scale, end.angle, end.angle.name, end.angle.scale, text, text.name, text.scale, font, text.style, text.align,
+    text.baseline, text.margin, text.angle, stroke.style, stroke.style.name, stroke.style.scale, fill.style, fill.style.name, fill.style.scale, segmented,
+    interpolate, x.padding, y.padding, xmin, xmax, ymin, ymax, scale.min, scale.max, anchor, render=FALSE, url, normalize=FALSE, ...)}
 \description{Add a chart to the visualization.}
 \details{\code{pv.chart} Adds a chart to the visualization.  This is the core charting function which all other charting functions reference.
 Function is generally not used directly, but is called by the higher level functions (e.g. pv.line, pv.dot).}

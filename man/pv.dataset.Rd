@@ -9,5 +9,5 @@
 \author{Shane Conway \email{shane.conway@gmail.com}}
 \references{\url{http://vis.stanford.edu/protovis/}}
 \arguments{\item{data}{The dataset to be used in the graphic.}
-\item{name}{}}
+\item{name}{The name of the dataset.}}
 \examples{pv.dataset(data=data.frame(wheat=1:10), name="wheat")}

@@ -1,7 +1,7 @@
-\name{+.webvis}
+\name{"+.webvis"}
 \alias{+.webvis}
 \title{Add a new layers to a visualization.}
-\usage{+.webvis(parent, child)}
+\usage{"+.webvis"(parent, child)}
 \description{Add a new layers to a visualization.}
 \details{\code{+.webvis} Add a new layers to a visualization.}
 \value{A webvis object.}

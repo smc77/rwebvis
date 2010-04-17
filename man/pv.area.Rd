@@ -1,10 +1,8 @@
 \name{pv.area}
 \alias{pv.area}
 \title{Add a bar to the visualization.}
-\usage{pv.area(bottom=0, height.name="y", left.name="x",
-    height.scale=paste("linear", height.name, "y", sep = "."),
-    left.scale=paste("linear", left.name, "x", sep = "."), scale.min=0,
-    ...)}
+\usage{pv.area(bottom=0, height.name="y", left.name="x", height.scale=paste("linear", height.name, "y", sep = "."), left.scale=paste("linear", left.name, "x", sep =
+    "."), scale.min=0, ...)}
 \description{Add a bar to the visualization.}
 \details{\code{pv.area} Adds a bar plot to the visualization}
 \value{A wv object.}
@@ -16,8 +14,8 @@
 \item{left.name}{The name of the field in the supplied data frame or vector.}
 \item{height.scale}{The scale of the field in the supplied data frame or vector.}
 \item{left.scale}{The scale of the field in the supplied data frame or vector.}
-\item{bottom}{}
-\item{scale.min}{}
+\item{bottom}{The distance from the bottom of the panel.}
+\item{scale.min}{The minimum value for the y-axis scale.}
 \item{...}{The parameters from pv.chart}}
 \examples{# line example 1 (using layers)
 wv <- pv.panel(width=150, height=150)

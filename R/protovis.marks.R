@@ -70,11 +70,11 @@ pv.line <- function(bottom.name="y", left.name="x", bottom.scale=paste("linear",
 #' @param left.name The name of the field in the supplied data frame or vector. 
 #' @param height.scale The scale of the field in the supplied data frame or vector. 
 #' @param left.scale The scale of the field in the supplied data frame or vector. 
-#' @param bottom
-#' @param width
-#' @param width.name
-#' @param xmax
-#' @param scale.min
+#' @param bottom The bottom of the bar, with respect to the panel.
+#' @param width The width of each bar.
+#' @param width.name The name of the field in the data for the width.
+#' @param xmax The max scale for the x-axis.
+#' @param scale.min The minimum y-value for scaling.
 #' @param ... The parameters from pv.chart 
 #' @return A wv object.
 #' @keywords hplot
@@ -123,8 +123,8 @@ pv.bar <- function(height.name="y", left.name="x", height.scale="linear.y.y", le
 #' @param left.name The name of the field in the supplied data frame or vector. 
 #' @param height.scale The scale of the field in the supplied data frame or vector. 
 #' @param left.scale The scale of the field in the supplied data frame or vector. 
-#' @param bottom
-#' @param scale.min
+#' @param bottom The distance from the bottom of the panel.
+#' @param scale.min The minimum value for the y-axis scale.
 #' @param ... The parameters from pv.chart 
 #' @return A wv object.
 #' @keywords hplot

@@ -1,8 +1,7 @@
 \name{pv.line}
 \alias{pv.line}
 \title{Add a line to the visualization.}
-\usage{pv.line(bottom.name="y", left.name="x", bottom.scale=paste("linear",
-    bottom.name, "y", sep = "."), left.scale="linear.x.x", ...)}
+\usage{pv.line(bottom.name="y", left.name="x", bottom.scale=paste("linear", bottom.name, "y", sep = "."), left.scale="linear.x.x", ...)}
 \description{Add a line to the visualization.}
 \details{\code{pv.line} Adds a line plot to the visualization}
 \value{A wv object.}

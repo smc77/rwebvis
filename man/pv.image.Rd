@@ -1,9 +1,8 @@
 \name{pv.image}
 \alias{pv.image}
 \title{Add an image to the visualization.}
-\usage{pv.image(url, left.name="x", bottom.name="y",
-    bottom.scale=paste("linear", bottom.name, "y", sep = "."),
-    left.scale=paste("linear", left.name, "x", sep = "."), ...)}
+\usage{pv.image(url, left.name="x", bottom.name="y", bottom.scale=paste("linear", bottom.name, "y", sep = "."), left.scale=paste("linear", left.name, "x", sep =
+    "."), ...)}
 \description{Add an image to the visualization.}
 \details{\code{pv.image} Add an image to the visualization.}
 \value{A wv object.}

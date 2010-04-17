@@ -1,9 +1,7 @@
 \name{pv.bar}
 \alias{pv.bar}
 \title{Add a bar to the visualization.}
-\usage{pv.bar(height.name="y", left.name="x", height.scale="linear.y.y",
-    left.scale="linear.x.x", bottom=0, width, width.name, xmax,
-    scale.min=0, ...)}
+\usage{pv.bar(height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width, width.name, xmax, scale.min=0, ...)}
 \description{Add a bar to the visualization.}
 \details{\code{pv.bar} Adds a bar plot to the visualization}
 \value{A wv object.}
@@ -15,11 +13,11 @@
 \item{left.name}{The name of the field in the supplied data frame or vector.}
 \item{height.scale}{The scale of the field in the supplied data frame or vector.}
 \item{left.scale}{The scale of the field in the supplied data frame or vector.}
-\item{bottom}{}
-\item{width}{}
-\item{width.name}{}
-\item{xmax}{}
-\item{scale.min}{}
+\item{bottom}{The bottom of the bar, with respect to the panel.}
+\item{width}{The width of each bar.}
+\item{width.name}{The name of the field in the data for the width.}
+\item{xmax}{The max scale for the x-axis.}
+\item{scale.min}{The minimum y-value for scaling.}
 \item{...}{The parameters from pv.chart}}
 \examples{plot.webvis(x=c(1, 2, 1.5, 3, 1.2), type="bar", scale.min=0)
 pv.bar(data=c(1, 1.2, 1.7, 1.5, .7, .5, .2), height.name="y", left.name="x", height.scale="linear.y.y", left.scale="linear.x.x", bottom=0, width=25, render=TRUE)

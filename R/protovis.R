@@ -58,6 +58,9 @@ NULL
 	parent$branch[[i+1]] <- child 
 	parent
 }
+#`%+%` <- function (parent, child) {
+#	`+.webvis`(parent=parent, child=child)
+#}
 
 #' Create a new webvis object to store each layer of the visualization.
 #'
@@ -272,7 +275,7 @@ pv.panel <- function(wv=NULL, data, width=300, height=200, left, right, bottom, 
 #' \code{pv.dataset} Add a dataset as a variable to the visualization.
 #'
 #' @param data The dataset to be used in the graphic.
-#' @param name
+#' @param name The name of the dataset.
 #' @return A string of the relevant javascript.
 #' @keywords hplot
 #' @author Shane Conway \email{shane.conway@@gmail.com}
@@ -515,6 +518,27 @@ unfold.webvis <- function(wv, name="vis", parent=NULL) {
 	wv2 <- unlist(c(root, wv2, wv$render))
 	class(wv2) <- "webvis.flat"
 	wv2
+}
+
+#' Creates a theme to be used by a webvis chart object.
+#'
+#' \code{webvis.theme} Creates a theme to be used by a webvis chart object.  Not currently used anywhere.
+#'
+#' @param background The background color.
+#' @param font The found used for any text.
+#' @param colors The color spectrum.
+#' @param grid The grid colors.
+#' @return A webvis.theme object.
+#' @author Shane Conway \email{shane.conway@@gmail.com}
+#' @references
+#' \url{http://vis.stanford.edu/protovis/}
+webvis.theme <- function(background, font, colors, grid) {
+	wv.t <- list(background=background,
+			font=font, 
+			colors=colors,
+			grid=grid)
+	class(wv.t) <- "webvis.theme"
+	wv.t
 }
 
 #' Simplified plot function for web vis plots.
